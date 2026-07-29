@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { CheckSquare, AlertCircle, Video, ShieldCheck, Award, Loader, Check, CircleDot } from 'lucide-react';
+import { CheckSquare, AlertCircle, Video, ShieldCheck, Award, Loader, Check, CircleDot, Sun, Moon } from 'lucide-react';
 
 export default function ApprovalsPage() {
     const [user, setUser] = useState<any>(null);
@@ -145,6 +145,19 @@ export default function ApprovalsPage() {
                     darkMode ? 'border-slate-900 bg-slate-900/10' : 'border-slate-200 bg-white/60'
                 }`}>
                     <h1 className="text-xl font-bold tracking-tight">Approvals Desk</h1>
+                    
+                    {/* Theme Toggle Button */}
+                    <button
+                        onClick={toggleTheme}
+                        className={`p-2 rounded-lg border transition-all duration-200 flex items-center justify-center ${
+                            darkMode 
+                                ? 'border-slate-800 bg-slate-900/50 hover:bg-slate-950 text-amber-400 hover:text-amber-300' 
+                                : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 shadow-sm'
+                        }`}
+                        title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    >
+                        {darkMode ? <Sun className="h-4 w-4 animate-pulse" /> : <Moon className="h-4 w-4" />}
+                    </button>
                 </header>
 
                 {/* Viewport */}

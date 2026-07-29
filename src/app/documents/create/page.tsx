@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { ArrowLeft, FileText, Send } from 'lucide-react';
+import { ArrowLeft, FileText, Send, Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CreateDocumentPage() {
@@ -117,18 +117,33 @@ export default function CreateDocumentPage() {
             {/* Main Section */}
             <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
                 {/* Header */}
-                <header className={`h-16 px-8 border-b flex items-center gap-4 shrink-0 relative z-20 backdrop-blur-md ${
+                <header className={`h-16 px-8 border-b flex items-center justify-between shrink-0 relative z-20 backdrop-blur-md ${
                     darkMode ? 'border-slate-900 bg-slate-900/10' : 'border-slate-200 bg-white/60'
                 }`}>
-                    <Link
-                        href="/documents"
-                        className={`p-2 rounded-xl transition-all ${
-                            darkMode ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/documents"
+                            className={`p-2 rounded-xl transition-all ${
+                                darkMode ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                            }`}
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                        <h1 className="text-xl font-bold tracking-tight">Create Document Draft</h1>
+                    </div>
+
+                    {/* Theme Toggle Button */}
+                    <button
+                        onClick={toggleTheme}
+                        className={`p-2 rounded-lg border transition-all duration-200 flex items-center justify-center ${
+                            darkMode 
+                                ? 'border-slate-800 bg-slate-900/50 hover:bg-slate-950 text-amber-400 hover:text-amber-300' 
+                                : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 shadow-sm'
                         }`}
+                        title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                     >
-                        <ArrowLeft className="h-5 w-5" />
-                    </Link>
-                    <h1 className="text-xl font-bold tracking-tight">Create Document Draft</h1>
+                        {darkMode ? <Sun className="h-4 w-4 animate-pulse" /> : <Moon className="h-4 w-4" />}
+                    </button>
                 </header>
 
                 {/* Viewport */}

@@ -96,31 +96,19 @@ export default function Sidebar({ darkMode, toggleTheme, user }: SidebarProps) {
                     </div>
                 )}
 
-                {/* Theme & Logout Buttons */}
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={toggleTheme}
-                        className={`flex-1 py-2 px-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-medium transition-all duration-200 ${
-                            darkMode 
-                                ? 'border-slate-800 bg-slate-950/50 hover:bg-slate-950 text-amber-400' 
-                                : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                        }`}
-                        title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                    >
-                        {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                        Theme
-                    </button>
-
+                {/* Logout Button */}
+                <div className="flex items-center">
                     <button
                         onClick={handleLogout}
-                        className={`py-2 px-3 rounded-xl border flex items-center justify-center transition-all ${
+                        className={`w-full py-2.5 px-4 rounded-xl border flex items-center justify-center gap-2 text-xs font-medium transition-all duration-200 ${
                             darkMode 
                                 ? 'border-slate-800 bg-slate-950/50 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10' 
-                                : 'border-slate-200 bg-slate-50 text-slate-500 hover:text-rose-600 hover:bg-rose-500/10'
+                                : 'border-slate-200 bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-500/10'
                         }`}
                         title="Sign Out"
                     >
                         <LogOut className="h-4 w-4" />
+                        Sign Out
                     </button>
                 </div>
             </div>

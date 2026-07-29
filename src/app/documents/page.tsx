@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { FileText, Plus, Filter, CheckCircle, Clock, ShieldAlert, Award } from 'lucide-react';
+import { FileText, Plus, Filter, CheckCircle, Clock, ShieldAlert, Award, Sun, Moon } from 'lucide-react';
 
 export default function DocumentsPage() {
     const [user, setUser] = useState<any>(null);
@@ -102,15 +102,31 @@ export default function DocumentsPage() {
                     darkMode ? 'border-slate-900 bg-slate-900/10' : 'border-slate-200 bg-white/60'
                 }`}>
                     <h1 className="text-xl font-bold tracking-tight">Documents History</h1>
-                    {/* Add Document button (Visible to Field Officers & admins) */}
-                    {(user?.role === 'FIELD_OFFICER' || user?.role === 'SUPER_ADMIN') && (
-                        <Link
-                            href="/documents/create"
-                            className="flex items-center gap-2 py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-xs shadow-md transition-all active:scale-95"
+                    
+                    <div className="flex items-center gap-4">
+                        {/* Theme Toggle Button */}
+                        <button
+                            onClick={toggleTheme}
+                            className={`p-2 rounded-lg border transition-all duration-200 flex items-center justify-center ${
+                                darkMode 
+                                    ? 'border-slate-800 bg-slate-900/50 hover:bg-slate-950 text-amber-400 hover:text-amber-300' 
+                                    : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 shadow-sm'
+                            }`}
+                            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         >
-                            <Plus className="h-4 w-4" /> Create Document
-                        </Link>
-                    )}
+                            {darkMode ? <Sun className="h-4 w-4 animate-pulse" /> : <Moon className="h-4 w-4" />}
+                        </button>
+
+                        {/* Add Document button (Visible to Field Officers & admins) */}
+                        {(user?.role === 'FIELD_OFFICER' || user?.role === 'SUPER_ADMIN') && (
+                            <Link
+                                href="/documents/create"
+                                className="flex items-center gap-2 py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-xs shadow-md transition-all active:scale-95"
+                            >
+                                <Plus className="h-4 w-4" /> Create Document
+                            </Link>
+                        )}
+                    </div>
                 </header>
 
                 {/* Viewport */}
