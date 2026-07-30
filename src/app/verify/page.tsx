@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { SearchCheck, Loader, ShieldCheck, ShieldAlert, Award, FileText, CheckCircle, User, Calendar, Anchor, Sun, Moon } from 'lucide-react';
+import { SearchCheck, Loader, ShieldCheck, ShieldAlert, Award, FileText, CheckCircle, User, Calendar, Anchor, Sun, Moon, ExternalLink, Upload } from 'lucide-react';
 
 export default function VerificationPage() {
     const [user, setUser] = useState<any>(null);
@@ -17,6 +17,8 @@ export default function VerificationPage() {
     const [hashInput, setHashInput] = useState('');
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState('');
+    const [activeTab, setActiveTab] = useState<'text' | 'file'>('text');
+    const [fileInput, setFileInput] = useState<File | null>(null);
 
     const router = useRouter();
 
@@ -62,6 +64,29 @@ export default function VerificationPage() {
             setResult(res.data.document);
         } catch (err: any) {
             setError(err.response?.data?.message || 'No matching anchored record found on the ledger.');
+        } finally {
+            setSearching(false);
+        }
+    };
+
+    const handleVerifyFile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!fileInput) return;
+
+        setSearching(true);
+        setError('');
+        setResult(null);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', fileInput);
+
+            const res = await api.post('/verify/file', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setResult(res.data.document);
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'No matching anchored record found on the ledger. The file content might have been modified.');
         } finally {
             setSearching(false);
         }
@@ -128,31 +153,94 @@ export default function VerificationPage() {
                             <h2 className="text-xl font-bold">Verify Document Authenticity</h2>
                         </div>
                         <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'} mb-6`}>
-                            Input the document's cryptographic hash, ID, or title to query the immutable blockchain anchors and audit logs.
+                            Verify standard documents or audit trails on the immutable blockchain ledger.
                         </p>
 
-                        <form onSubmit={handleVerify} className="flex gap-4">
-                            <input
-                                type="text"
-                                value={hashInput}
-                                onChange={(e) => setHashInput(e.target.value)}
-                                className={`flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
-                                    darkMode 
-                                        ? 'bg-slate-950/50 border-slate-800 text-slate-100 placeholder-slate-600' 
-                                        : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400 shadow-sm'
-                                }`}
-                                placeholder="Paste document hash (e.g. 8f497ca839818...) or title"
-                                required
-                            />
+                        {/* Tab Switcher */}
+                        <div className="flex border-b border-inherit mb-6">
                             <button
-                                type="submit"
-                                disabled={searching}
-                                className="py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 shrink-0"
+                                onClick={() => { setActiveTab('text'); setError(''); setResult(null); }}
+                                className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all ${
+                                    activeTab === 'text'
+                                        ? 'border-emerald-500 text-emerald-500'
+                                        : 'border-transparent text-slate-500 hover:text-slate-700'
+                                }`}
                             >
-                                {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
-                                Verify
+                                Search by Hash / ID / Title
                             </button>
-                        </form>
+                            <button
+                                onClick={() => { setActiveTab('file'); setError(''); setResult(null); }}
+                                className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all ${
+                                    activeTab === 'file'
+                                        ? 'border-emerald-500 text-emerald-500'
+                                        : 'border-transparent text-slate-500 hover:text-slate-700'
+                                }`}
+                            >
+                                Scan Accounting Trail File
+                            </button>
+                        </div>
+
+                        {activeTab === 'text' ? (
+                            <form onSubmit={handleVerify} className="flex gap-4">
+                                <input
+                                    type="text"
+                                    value={hashInput}
+                                    onChange={(e) => setHashInput(e.target.value)}
+                                    className={`flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                        darkMode 
+                                            ? 'bg-slate-950/50 border-slate-800 text-slate-100 placeholder-slate-600' 
+                                            : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400 shadow-sm'
+                                    }`}
+                                    placeholder="Paste document hash (e.g. 8f497ca839818...) or title"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={searching}
+                                    className="py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 shrink-0"
+                                >
+                                    {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
+                                    Verify
+                                </button>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleVerifyFile} className="space-y-4">
+                                <div className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                                    darkMode 
+                                        ? 'border-slate-800 bg-slate-950/20 hover:border-slate-700' 
+                                        : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                                }`}>
+                                    <input 
+                                        type="file" 
+                                        id="verify-file-upload"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files.length > 0) {
+                                                setFileInput(e.target.files[0]);
+                                            }
+                                        }}
+                                        className="hidden"
+                                        required
+                                    />
+                                    <label htmlFor="verify-file-upload" className="cursor-pointer">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <Upload className="h-10 w-10 text-slate-400 mb-2" />
+                                            <span className="text-sm font-semibold block text-emerald-500">
+                                                {fileInput ? fileInput.name : "Select accounting file to audit"}
+                                            </span>
+                                            <span className="text-xs text-slate-500 mt-1">Upload the local file to scan its hash against the ledger</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={searching || !fileInput}
+                                    className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                                >
+                                    {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
+                                    Scan & Audit Document Trail
+                                </button>
+                            </form>
+                        )}
                     </div>
 
                     {/* Result Panel */}
@@ -180,6 +268,16 @@ export default function VerificationPage() {
                                             <div>
                                                 <span className="block text-xs text-slate-500">Title</span>
                                                 <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.title}</span>
+                                                {result.fileUrl && (
+                                                    <a
+                                                        href={result.fileUrl.startsWith('http') ? result.fileUrl : `${api.defaults.baseURL}${result.fileUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 flex items-center gap-1 mt-1"
+                                                    >
+                                                        <ExternalLink className="h-3 w-3" /> Open File
+                                                    </a>
+                                                )}
                                             </div>
                                         </div>
 
