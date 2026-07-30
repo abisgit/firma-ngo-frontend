@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { ArrowLeft, FileText, Send, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, FileText, Send, Sun, Moon, Upload } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CreateDocumentPage() {
@@ -20,6 +20,13 @@ export default function CreateDocumentPage() {
     const [documentType, setDocumentType] = useState('GRANT_PROPOSAL');
     const [projectId, setProjectId] = useState('');
     const [error, setError] = useState('');
+    const [file, setFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        if (projects.length > 0 && !projectId) {
+            setProjectId(projects[0].id);
+        }
+    }, [projects, projectId]);
 
     const router = useRouter();
 
@@ -74,11 +81,26 @@ export default function CreateDocumentPage() {
         setError('');
 
         try {
+            let uploadedFileUrl = '/uploads/sample_proposal.pdf';
+
+            // If a file is selected, upload it to the backend first
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const uploadRes = await api.post('/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                uploadedFileUrl = uploadRes.data.fileUrl;
+            }
+
             await api.post('/documents', {
                 title,
                 documentType,
                 projectId: projectId || null,
-                fileUrl: '/uploads/sample_proposal.pdf' // Place holder file url
+                fileUrl: uploadedFileUrl
             });
             router.push('/documents');
         } catch (err: any) {
@@ -220,6 +242,37 @@ export default function CreateDocumentPage() {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+
+                            {/* File Upload Option */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Upload Document File</label>
+                                <div className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                                    darkMode 
+                                        ? 'border-slate-800 bg-slate-950/20 hover:border-slate-700' 
+                                        : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                                }`}>
+                                    <input 
+                                        type="file" 
+                                        id="file-upload"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files.length > 0) {
+                                                setFile(e.target.files[0]);
+                                            }
+                                        }}
+                                        className="hidden"
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx"
+                                    />
+                                    <label htmlFor="file-upload" className="cursor-pointer">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                                            <span className="text-sm font-semibold block text-emerald-500">
+                                                {file ? file.name : "Click to select a file"}
+                                            </span>
+                                            <span className="text-xs text-slate-500 mt-1">Supports PDF, DOC, XLS up to 10MB</span>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
 
                             {/* Submit Button */}

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { FileText, Plus, Filter, CheckCircle, Clock, ShieldAlert, Award, Sun, Moon } from 'lucide-react';
+import { FileText, Plus, Filter, CheckCircle, Clock, ShieldAlert, Award, Sun, Moon, ExternalLink } from 'lucide-react';
 
 export default function DocumentsPage() {
     const [user, setUser] = useState<any>(null);
@@ -216,6 +216,21 @@ export default function DocumentsPage() {
                                         <p>Project: <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>{doc.project?.name || 'Unassigned'}</strong></p>
                                         <p>Creator: {doc.creator?.firstName} {doc.creator?.lastName} ({doc.creator?.role?.replace('_', ' ')})</p>
                                     </div>
+
+                                    {doc.fileUrl && (
+                                        <a
+                                            href={doc.fileUrl.startsWith('http') ? doc.fileUrl : `${api.defaults.baseURL}${doc.fileUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
+                                                darkMode
+                                                    ? 'bg-slate-950/40 border-slate-800 text-emerald-400 hover:bg-slate-900 hover:text-emerald-300'
+                                                    : 'bg-slate-50 border-slate-200 text-emerald-600 hover:bg-slate-100 hover:text-emerald-700'
+                                            }`}
+                                        >
+                                            <ExternalLink className="h-3.5 w-3.5" /> View Document File
+                                        </a>
+                                    )}
                                 </div>
 
                                 {/* Cryptographic Proof Log */}
