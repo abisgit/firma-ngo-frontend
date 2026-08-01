@@ -12,7 +12,25 @@ export default function ProjectsPage() {
     const [projects, setProjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [newProject, setNewProject] = useState({
+        name: '',
+        projectCode: '',
+        budget: '',
+        startDate: '',
+        endDate: ''
+    });
     const router = useRouter();
+
+    const fetchProjects = async () => {
+        try {
+            const projRes = await api.get('/projects');
+            setProjects(projRes.data);
+        } catch (err) {
+            console.error('Error fetching projects:', err);
+        }
+    };
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
@@ -36,7 +54,7 @@ export default function ProjectsPage() {
                 const projRes = await api.get('/projects');
                 setProjects(projRes.data);
             } catch (err) {
-                console.error('Error fetching projects:', err);
+                console.error('Error fetching initial data:', err);
                 router.push('/login');
             } finally {
                 setLoading(false);
@@ -45,6 +63,22 @@ export default function ProjectsPage() {
 
         fetchData();
     }, [router]);
+
+    const handleCreateProject = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setCreating(true);
+        try {
+            await api.post('/projects', newProject);
+            setShowCreateModal(false);
+            setNewProject({ name: '', projectCode: '', budget: '', startDate: '', endDate: '' });
+            await fetchProjects();
+        } catch (err) {
+            console.error('Failed to create project:', err);
+            alert('Failed to create project. Please check the inputs or try again.');
+        } finally {
+            setCreating(false);
+        }
+    };
 
     const toggleTheme = () => {
         const newDarkMode = !darkMode;
@@ -96,11 +130,19 @@ export default function ProjectsPage() {
 
                 {/* Viewport */}
                 <main className="flex-1 px-8 py-8 relative z-10">
-                    <div className="mb-6">
-                        <h2 className="text-2xl font-bold tracking-tight">Active Portfolios</h2>
-                        <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'} mt-1`}>
-                            Track active programs, operational budgets, and cross-border project logistics.
-                        </p>
+                    <div className="mb-6 flex justify-between items-end">
+                        <div>
+                            <h2 className="text-2xl font-bold tracking-tight">Active Portfolios</h2>
+                            <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'} mt-1`}>
+                                Track active programs, operational budgets, and cross-border project logistics.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
+                        >
+                            + Create Project
+                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -164,6 +206,87 @@ export default function ProjectsPage() {
                     </div>
                 </main>
             </div>
+
+            {/* Create Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className={`w-full max-w-md p-6 rounded-2xl shadow-xl ${darkMode ? 'bg-slate-900 border border-slate-800' : 'bg-white'}`}>
+                        <h2 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Create New Project</h2>
+                        <form onSubmit={handleCreateProject} className="space-y-4">
+                            <div>
+                                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Project Name</label>
+                                <input 
+                                    type="text" required
+                                    value={newProject.name} onChange={e => setNewProject({...newProject, name: e.target.value})}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                        darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
+                                    }`}
+                                />
+                            </div>
+                            <div>
+                                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Project Code</label>
+                                <input 
+                                    type="text" required
+                                    value={newProject.projectCode} onChange={e => setNewProject({...newProject, projectCode: e.target.value})}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                        darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
+                                    }`}
+                                />
+                            </div>
+                            <div>
+                                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Budget (USD)</label>
+                                <input 
+                                    type="number"
+                                    value={newProject.budget} onChange={e => setNewProject({...newProject, budget: e.target.value})}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                        darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
+                                    }`}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Start Date</label>
+                                    <input 
+                                        type="date"
+                                        value={newProject.startDate} onChange={e => setNewProject({...newProject, startDate: e.target.value})}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                            darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
+                                        }`}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>End Date</label>
+                                    <input 
+                                        type="date"
+                                        value={newProject.endDate} onChange={e => setNewProject({...newProject, endDate: e.target.value})}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                            darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
+                                        }`}
+                                    />
+                                </div>
+                            </div>
+                            <div className="pt-4 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCreateModal(false)}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                        darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                    }`}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={creating}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                                >
+                                    {creating ? 'Creating...' : 'Create Project'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
