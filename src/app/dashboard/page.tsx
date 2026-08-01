@@ -15,12 +15,8 @@ export default function DashboardPage() {
     const router = useRouter();
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            setDarkMode(true);
-        } else {
-            setDarkMode(false);
-        }
+        setDarkMode(false);
+        localStorage.setItem('theme', 'light');
 
         const fetchDashboardData = async () => {
             const token = localStorage.getItem('token');
