@@ -6,6 +6,7 @@ import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
 import { Shield, Award, User, Building, MapPin, Briefcase, FileText, CheckCircle2, CloudLightning, Sun, Moon } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null);
@@ -158,17 +159,17 @@ export default function DashboardPage() {
                     {/* Stats Metrics Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         {[
-                            { name: 'Active Projects', value: stats.projects, icon: Briefcase, color: 'emerald' },
-                            { name: 'Total Documents', value: stats.documents, icon: FileText, color: 'blue' },
-                            { name: 'Pending Approvals', value: stats.pending, icon: CheckCircle2, color: 'amber' },
-                            { name: 'Anchored on Ledger', value: stats.anchored, icon: CloudLightning, color: 'teal' }
+                            { name: 'Active Projects', value: stats.projects, icon: Briefcase, color: 'emerald', link: '/projects' },
+                            { name: 'Total Documents', value: stats.documents, icon: FileText, color: 'blue', link: '/documents' },
+                            { name: 'Pending Approvals', value: stats.pending, icon: CheckCircle2, color: 'amber', link: '/approvals' },
+                            { name: 'Anchored on Ledger', value: stats.anchored, icon: CloudLightning, color: 'teal', link: '/verify' }
                         ].map((stat, i) => {
                             const Icon = stat.icon;
                             return (
-                                <div key={i} className={`border rounded-2xl p-6 transition-all duration-200 ${
+                                <Link href={stat.link} key={i} className={`block border rounded-2xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-1 ${
                                     darkMode 
-                                        ? 'bg-slate-900/40 border-slate-800/85' 
-                                        : 'bg-white border-slate-200 shadow-sm'
+                                        ? 'bg-slate-900/40 border-slate-800/85 hover:bg-slate-900/60' 
+                                        : 'bg-white border-slate-200 shadow-sm hover:bg-slate-50'
                                 }`}>
                                     <div className="flex items-center justify-between mb-4">
                                         <span className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{stat.name}</span>
@@ -185,7 +186,7 @@ export default function DashboardPage() {
                                     }`}>
                                         {stat.value}
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>

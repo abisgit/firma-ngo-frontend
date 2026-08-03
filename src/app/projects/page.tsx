@@ -6,6 +6,7 @@ import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
 import { Calendar, DollarSign, Award, Folder, Sun, Moon } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProjectsPage() {
     const [user, setUser] = useState<any>(null);
@@ -147,12 +148,13 @@ export default function ProjectsPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {projects.map((project) => (
-                            <div
+                            <Link
+                                href={`/projects/${project.id}`}
                                 key={project.id}
-                                className={`border rounded-2xl p-6 transition-all duration-200 hover:shadow-md flex flex-col justify-between ${
+                                className={`block border rounded-2xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-1 flex flex-col justify-between ${
                                     darkMode 
-                                        ? 'bg-slate-900/40 border-slate-800/85 hover:border-slate-700/80' 
-                                        : 'bg-white border-slate-200 shadow-sm hover:border-slate-300'
+                                        ? 'bg-slate-900/40 border-slate-800/85 hover:border-slate-700/80 hover:bg-slate-900/60' 
+                                        : 'bg-white border-slate-200 shadow-sm hover:border-slate-300 hover:bg-slate-50'
                                 }`}
                             >
                                 <div>
@@ -195,7 +197,7 @@ export default function ProjectsPage() {
                                         </span>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
 
                         {projects.length === 0 && (
