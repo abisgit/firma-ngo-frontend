@@ -66,7 +66,7 @@ function VerificationContent() {
                 setSearching(true);
                 try {
                     const res = await api.post('/verify', { hash: hashFromUrl });
-                    setResult(res.data.document);
+                    setResult(res.data);
                 } catch (err: any) {
                     setError(err.response?.data?.message || 'No matching anchored record found on the ledger.');
                 } finally {
@@ -87,7 +87,7 @@ function VerificationContent() {
 
         try {
             const res = await api.post('/verify', { hash: hashInput });
-            setResult(res.data.document);
+            setResult(res.data);
         } catch (err: any) {
             setError(err.response?.data?.message || 'No matching anchored record found on the ledger.');
         } finally {
@@ -110,7 +110,7 @@ function VerificationContent() {
             const res = await api.post('/verify/file', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            setResult(res.data.document);
+            setResult(res.data);
         } catch (err: any) {
             setError(err.response?.data?.message || 'No matching anchored record found on the ledger. The file content might have been modified.');
         } finally {
@@ -276,12 +276,30 @@ function VerificationContent() {
                             darkMode ? 'bg-slate-900/40 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
                         }`}>
                             {/* Verification Success Header */}
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-primary-500/10 border border-primary-500/20 text-primary-500 rounded-xl">
-                                <ShieldCheck className="h-6 w-6 shrink-0" />
-                                <div>
-                                    <h3 className="font-bold text-sm">Ledger Verification Succeeded</h3>
-                                    <p className="text-xs text-primary-400/90 mt-0.5">The document hash matches an authentic anchored record on the ledger.</p>
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-4 bg-primary-500/10 border border-primary-500/20 rounded-xl">
+                                <div className="flex items-center gap-3 text-primary-500">
+                                    <ShieldCheck className="h-6 w-6 shrink-0" />
+                                    <div>
+                                        <h3 className="font-bold text-sm">Ledger Verification Succeeded</h3>
+                                        <p className="text-xs text-primary-400/90 mt-0.5">The document hash matches an authentic anchored record on the ledger.</p>
+                                    </div>
                                 </div>
+                                
+                                {result.organization && (
+                                    <div className={`flex items-center gap-3 px-4 py-2 rounded-lg border bg-white/50 backdrop-blur-sm ${darkMode ? 'border-slate-800 bg-slate-900/50' : 'border-slate-200'}`}>
+                                        <div className="flex flex-col text-right">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Issued & Anchored By</span>
+                                            <span className={`text-xs font-bold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.organization.name}</span>
+                                        </div>
+                                        {result.organization.themeLogoUrl && (
+                                            <img 
+                                                src={result.organization.themeLogoUrl.startsWith('http') || result.organization.themeLogoUrl.startsWith('data:') ? result.organization.themeLogoUrl : `${api.defaults.baseURL || 'http://localhost:3004'}${result.organization.themeLogoUrl}`} 
+                                                alt="Organization Logo" 
+                                                className="h-8 w-auto object-contain" 
+                                            />
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Document Info */}
@@ -294,10 +312,10 @@ function VerificationContent() {
                                             <FileText className="h-4 w-4 mt-0.5 text-slate-500" />
                                             <div>
                                                 <span className="block text-xs text-slate-500">Title</span>
-                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.title}</span>
-                                                {result.fileUrl && (
+                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.document.title}</span>
+                                                {result.document.fileUrl && (
                                                     <a
-                                                        href={result.fileUrl.startsWith('http') ? result.fileUrl : `${api.defaults.baseURL}${result.fileUrl}`}
+                                                        href={result.document.fileUrl.startsWith('http') || result.document.fileUrl.startsWith('data:') ? result.document.fileUrl : `${api.defaults.baseURL || 'http://localhost:3004'}${result.document.fileUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-xs font-semibold text-primary-500 hover:text-primary-400 flex items-center gap-1 mt-1"
@@ -312,7 +330,7 @@ function VerificationContent() {
                                             <CheckCircle className="h-4 w-4 mt-0.5 text-slate-500" />
                                             <div>
                                                 <span className="block text-xs text-slate-500">Document Type</span>
-                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.documentType?.replace('_', ' ')}</span>
+                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.document.documentType?.replace('_', ' ')}</span>
                                             </div>
                                         </div>
 
@@ -320,7 +338,7 @@ function VerificationContent() {
                                             <User className="h-4 w-4 mt-0.5 text-slate-500" />
                                             <div>
                                                 <span className="block text-xs text-slate-500">Creator</span>
-                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.creator?.firstName} {result.creator?.lastName}</span>
+                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.document.creator?.firstName} {result.document.creator?.lastName}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -334,7 +352,7 @@ function VerificationContent() {
                                             <Anchor className="h-4 w-4 mt-0.5 text-primary-500" />
                                             <div className="min-w-0 flex-1">
                                                 <span className="block text-xs text-slate-500">SHA-256 Ledger Hash</span>
-                                                <span className="font-mono text-xs text-primary-500 break-all select-all">{result.blockchainHash}</span>
+                                                <span className="font-mono text-xs text-primary-500 break-all select-all">{result.document.blockchainHash}</span>
                                             </div>
                                         </div>
 
@@ -342,7 +360,7 @@ function VerificationContent() {
                                             <Anchor className="h-4 w-4 mt-0.5 text-slate-500" />
                                             <div className="min-w-0 flex-1">
                                                 <span className="block text-xs text-slate-500">Ledger Transaction ID</span>
-                                                <span className={`font-mono text-xs break-all select-all ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{result.txId}</span>
+                                                <span className={`font-mono text-xs break-all select-all ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{result.document.txId}</span>
                                             </div>
                                         </div>
 
@@ -350,7 +368,7 @@ function VerificationContent() {
                                             <Calendar className="h-4 w-4 mt-0.5 text-slate-500" />
                                             <div>
                                                 <span className="block text-xs text-slate-500">Sealed Date / Timestamp</span>
-                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{new Date(result.updatedAt).toLocaleString()}</span>
+                                                <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{new Date(result.document.updatedAt).toLocaleString()}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -361,7 +379,7 @@ function VerificationContent() {
                             <div className="border-t border-inherit pt-6">
                                 <h4 className={`text-xs uppercase font-bold tracking-wider mb-4 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Digital Signatures & Video-Consent Audit Logs</h4>
                                 <div className="space-y-4">
-                                    {result.signatures?.map((sig: any) => (
+                                    {result.document.signatures?.map((sig: any) => (
                                         <div key={sig.id} className={`p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
                                             darkMode ? 'bg-slate-950/40 border-slate-800/80' : 'bg-slate-50 border-slate-200'
                                         }`}>
@@ -386,7 +404,7 @@ function VerificationContent() {
                                             </div>
                                         </div>
                                     ))}
-                                    {(!result.signatures || result.signatures.length === 0) && (
+                                    {(!result.document.signatures || result.document.signatures.length === 0) && (
                                         <p className="text-xs italic text-slate-500">No cryptographic signature records found on this document.</p>
                                     )}
                                 </div>
