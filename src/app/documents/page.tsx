@@ -143,7 +143,7 @@ export default function DocumentsPage() {
         } catch (err) {
             console.error('Failed to fetch documents', err);
         }
-    };
+    }, []);
 
     const handleAnchor = async (id: string) => {
         try {
