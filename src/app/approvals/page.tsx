@@ -125,7 +125,7 @@ export default function ApprovalsPage() {
             }`}>
                 <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />
                 <div className="flex-1 flex flex-col h-screen items-center justify-center">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 text-sm mt-4">Loading verification queue...</p>
                 </div>
             </div>
@@ -220,7 +220,7 @@ export default function ApprovalsPage() {
                                             <button
                                                 onClick={() => handleStartSign(doc.id)}
                                                 disabled={actioningId === doc.id}
-                                                className="py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
+                                                className="py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
                                             >
                                                 {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Video className="h-3.5 w-3.5" />}
                                                 Verify & Sign
@@ -299,7 +299,7 @@ export default function ApprovalsPage() {
                                             <button
                                                 onClick={() => handleAnchor(doc.id)}
                                                 disabled={actioningId === doc.id}
-                                                className="py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
+                                                className="py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
                                             >
                                                 {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Award className="h-3.5 w-3.5" />}
                                                 Anchor to Ledger
@@ -330,7 +330,7 @@ export default function ApprovalsPage() {
                         darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
                     }`}>
                         <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
-                            <Video className="h-5 w-5 text-emerald-500" /> Biometric Verification
+                            <Video className="h-5 w-5 text-primary-500" /> Biometric Verification
                         </h3>
                         <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'} mb-6`}>
                             Record video attestation to prove your physical consent for the cryptographic signing key.
@@ -354,8 +354,8 @@ export default function ApprovalsPage() {
                             )}
                             {recordingStep === 2 && (
                                 <div className="text-center p-4">
-                                    <Check className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-                                    <span className="text-xs text-emerald-400 font-bold block">Attestation Captured Successfully</span>
+                                    <Check className="h-8 w-8 text-primary-500 mx-auto mb-2" />
+                                    <span className="text-xs text-primary-400 font-bold block">Attestation Captured Successfully</span>
                                     <p className="text-[10px] text-slate-500 mt-1">Biometric proof processed and mapped to the verification payload.</p>
                                 </div>
                             )}
@@ -383,7 +383,7 @@ export default function ApprovalsPage() {
                             ) : (
                                 <button
                                     onClick={handleConfirmSign}
-                                    className="flex-1 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl text-xs shadow-md transition-all active:scale-95"
+                                    className="flex-1 py-2.5 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl text-xs shadow-md transition-all active:scale-95"
                                 >
                                     Confirm & Sign Ledger
                                 </button>

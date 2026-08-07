@@ -73,7 +73,7 @@ export default function DashboardPage() {
             }`}>
                 <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />
                 <div className="flex-1 flex flex-col h-screen items-center justify-center">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     <p className={`text-sm mt-4 animate-pulse ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                         Loading secure environment...
                     </p>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
             <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
                 {/* Ambient lights */}
                 <div className={`absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none transition-opacity duration-500 ${
-                    darkMode ? 'bg-emerald-500/5 opacity-100' : 'bg-emerald-500/10 opacity-60'
+                    darkMode ? 'bg-primary-500/5 opacity-100' : 'bg-primary-500/10 opacity-60'
                 }`} />
 
                 {/* Dashboard Header */}
@@ -121,7 +121,7 @@ export default function DashboardPage() {
                                 ? 'bg-slate-900 border-slate-800 text-slate-300' 
                                 : 'bg-white border-slate-200 text-slate-700 shadow-sm'
                         }`}>
-                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="h-2 w-2 rounded-full bg-primary-500 animate-pulse" />
                             Connected
                         </div>
                     </div>
@@ -132,15 +132,15 @@ export default function DashboardPage() {
                     {/* Welcome Banner */}
                     <div className={`border transition-all duration-300 rounded-2xl p-8 mb-8 relative overflow-hidden bg-gradient-to-r ${
                         darkMode 
-                            ? 'from-emerald-950/20 to-teal-950/20 border-emerald-900/20' 
-                            : 'from-emerald-50 to-teal-50 border-emerald-100'
+                            ? 'from-primary-950/20 to-teal-950/20 border-primary-900/20' 
+                            : 'from-primary-50 to-teal-50 border-primary-100'
                     }`}>
                         <div className="absolute -right-10 -bottom-10 opacity-[0.03] pointer-events-none">
-                            <Shield className={`w-64 h-64 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                            <Shield className={`w-64 h-64 ${darkMode ? 'text-primary-400' : 'text-primary-600'}`} />
                         </div>
                         <div className="max-w-3xl">
                             <span className={`px-3 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${
-                                darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-700'
+                                darkMode ? 'bg-primary-500/10 text-primary-400' : 'bg-primary-100 text-primary-700'
                             }`}>
                                 {user?.role?.replace('_', ' ')}
                             </span>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                     {/* Stats Metrics Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         {[
-                            { name: 'Active Projects', value: stats.projects, icon: Briefcase, color: 'emerald', link: '/projects' },
+                            { name: 'Active Projects', value: stats.projects, icon: Briefcase, color: 'primary', link: '/projects' },
                             { name: 'Total Documents', value: stats.documents, icon: FileText, color: 'blue', link: '/documents' },
                             { name: 'Pending Approvals', value: stats.pending, icon: CheckCircle2, color: 'amber', link: '/approvals' },
                             { name: 'Anchored on Ledger', value: stats.anchored, icon: CloudLightning, color: 'teal', link: '/verify' }
@@ -176,8 +176,8 @@ export default function DashboardPage() {
                                         <span className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{stat.name}</span>
                                         <div className={`p-2 rounded-xl ${
                                             darkMode 
-                                                ? 'bg-slate-950/60 text-emerald-400' 
-                                                : 'bg-slate-50 text-emerald-600 border border-slate-100'
+                                                ? 'bg-slate-950/60 text-primary-400' 
+                                                : 'bg-slate-50 text-primary-600 border border-slate-100'
                                         }`}>
                                             <Icon className="h-5 w-5" />
                                         </div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                                 : 'bg-white border-slate-200 text-slate-600 shadow-sm'
                         }`}>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
+                                <div className={`p-2 rounded-lg ${darkMode ? 'bg-primary-500/10 text-primary-400' : 'bg-primary-100 text-primary-700'}`}>
                                     <User className="h-5 w-5" />
                                 </div>
                                 <h3 className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-850'}`}>Account Details</h3>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                     <div className={`mt-8 border rounded-xl p-6 text-center transition-all ${
                         darkMode ? 'bg-slate-900/20 border-slate-800/50' : 'bg-slate-100/50 border-slate-200'
                     }`}>
-                        <Award className={`h-8 w-8 mx-auto mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                        <Award className={`h-8 w-8 mx-auto mb-3 ${darkMode ? 'text-primary-400' : 'text-primary-600'}`} />
                         <h4 className={`font-semibold mb-1 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>FIRMA Trust Infrastructure Active</h4>
                         <p className={`text-xs max-w-md mx-auto ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>
                             All signatures and attestation workflows in this application are securely hashed and anchored to the core cryptographic ledger.

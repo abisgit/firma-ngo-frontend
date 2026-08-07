@@ -102,7 +102,7 @@ export default function StaffDetailPage() {
                     <div className="space-y-4">
                         <div>
                             <label className="text-sm font-medium text-slate-500 block mb-1">Account Status</label>
-                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${staff.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                            <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${staff.isActive ? 'bg-primary-100 text-primary-700' : 'bg-rose-100 text-rose-700'}`}>
                                 {staff.isActive ? 'Active' : 'Inactive'}
                             </span>
                         </div>

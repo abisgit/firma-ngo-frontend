@@ -94,7 +94,7 @@ export default function ProjectsPage() {
             }`}>
                 <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />
                 <div className="flex-1 flex flex-col h-screen items-center justify-center">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 text-sm mt-4">Loading projects data...</p>
                 </div>
             </div>
@@ -141,7 +141,7 @@ export default function ProjectsPage() {
                         </div>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
+                            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
                         >
                             + Create Project
                         </button>
@@ -163,8 +163,8 @@ export default function ProjectsPage() {
                                     <div className="flex items-center justify-between mb-4">
                                         <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${
                                             darkMode 
-                                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                                                : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                                ? 'bg-primary-500/10 text-primary-400 border-primary-500/20' 
+                                                : 'bg-primary-50 text-primary-700 border-primary-100'
                                         }`}>
                                             {project.projectCode}
                                         </span>
@@ -188,7 +188,7 @@ export default function ProjectsPage() {
                                     darkMode ? 'border-slate-800/80 text-slate-400' : 'border-slate-100 text-slate-600'
                                 }`}>
                                     <div className="flex items-center gap-2">
-                                        <DollarSign className="h-4 w-4 shrink-0 text-emerald-500" />
+                                        <DollarSign className="h-4 w-4 shrink-0 text-primary-500" />
                                         <span>Budget: <strong>${project.budget?.toLocaleString()} USD</strong></span>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export default function ProjectsPage() {
                                 <input 
                                     type="text" required
                                     value={newProject.name} onChange={e => setNewProject({...newProject, name: e.target.value})}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${
                                         darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
                                     }`}
                                 />
@@ -231,7 +231,7 @@ export default function ProjectsPage() {
                                 <input 
                                     type="text" required
                                     value={newProject.projectCode} onChange={e => setNewProject({...newProject, projectCode: e.target.value})}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${
                                         darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
                                     }`}
                                 />
@@ -241,7 +241,7 @@ export default function ProjectsPage() {
                                 <input 
                                     type="number"
                                     value={newProject.budget} onChange={e => setNewProject({...newProject, budget: e.target.value})}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${
                                         darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
                                     }`}
                                 />
@@ -252,7 +252,7 @@ export default function ProjectsPage() {
                                     <input 
                                         type="date"
                                         value={newProject.startDate} onChange={e => setNewProject({...newProject, startDate: e.target.value})}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${
                                             darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
                                         }`}
                                     />
@@ -262,7 +262,7 @@ export default function ProjectsPage() {
                                     <input 
                                         type="date"
                                         value={newProject.endDate} onChange={e => setNewProject({...newProject, endDate: e.target.value})}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none ${
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${
                                             darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300'
                                         }`}
                                     />
@@ -281,7 +281,7 @@ export default function ProjectsPage() {
                                 <button
                                     type="submit"
                                     disabled={creating}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                                    className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
                                 >
                                     {creating ? 'Creating...' : 'Create Project'}
                                 </button>

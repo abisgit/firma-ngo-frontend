@@ -72,7 +72,7 @@ export default function LoginPage() {
 
             {/* Background elements */}
             <div className={`absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none transition-opacity duration-500 ${
-                darkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/5'
+                darkMode ? 'bg-primary-500/10' : 'bg-primary-500/5'
             }`} />
             <div className={`absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none transition-opacity duration-500 ${
                 darkMode ? 'bg-blue-500/10' : 'bg-blue-500/5'
@@ -83,10 +83,10 @@ export default function LoginPage() {
                 darkMode ? 'bg-slate-900/40 border-slate-800/50' : 'bg-white/60 border-slate-200'
             }`}>
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-lg shadow-lg shadow-emerald-500/20">
+                    <div className="p-2 bg-gradient-to-tr from-primary-500 to-teal-400 rounded-lg shadow-lg shadow-primary-500/20">
                         <Shield className="h-8 w-8 text-slate-950" />
                     </div>
-                    <span className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-300">
+                    <span className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-teal-300">
                         FIRMA-NGO
                     </span>
                 </div>
@@ -96,7 +96,7 @@ export default function LoginPage() {
                         darkMode ? 'text-slate-50' : 'text-slate-900'
                     }`}>
                         Secure Logistics for <br />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-400">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-teal-400">
                             International NGOs
                         </span>
                     </h1>
@@ -110,7 +110,7 @@ export default function LoginPage() {
                         darkMode ? 'border-slate-800/80' : 'border-slate-200'
                     }`}>
                         <div>
-                            <div className={`text-3xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>Zero-Trust</div>
+                            <div className={`text-3xl font-bold ${darkMode ? 'text-primary-400' : 'text-primary-600'}`}>Zero-Trust</div>
                             <div className="text-sm text-slate-500 mt-1">Cryptographic integrity & blockchain anchors</div>
                         </div>
                         <div>
@@ -129,7 +129,7 @@ export default function LoginPage() {
             <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 relative z-10">
                 {/* Mobile branding */}
                 <div className="lg:hidden flex items-center gap-2 mb-12">
-                    <div className="p-1.5 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-md">
+                    <div className="p-1.5 bg-gradient-to-tr from-primary-500 to-teal-400 rounded-md">
                         <Shield className="h-6 w-6 text-slate-950" />
                     </div>
                     <span className={`text-xl font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>FIRMA-NGO</span>
@@ -161,7 +161,7 @@ export default function LoginPage() {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className={`block w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                    className={`block w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-sm ${
                                         darkMode 
                                             ? 'bg-slate-950/50 border-slate-800 text-slate-100 placeholder-slate-600' 
                                             : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400'
@@ -182,7 +182,7 @@ export default function LoginPage() {
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className={`block w-full pl-10 pr-10 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                    className={`block w-full pl-10 pr-10 py-3 border rounded-xl focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-sm ${
                                         darkMode 
                                             ? 'bg-slate-950/50 border-slate-800 text-slate-100 placeholder-slate-600' 
                                             : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400'
@@ -203,7 +203,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg shadow-emerald-500/10 text-sm"
+                            className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg shadow-primary-500/10 text-sm"
                         >
                             {loading ? 'Authenticating...' : 'Sign In'}
                             {!loading && <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}

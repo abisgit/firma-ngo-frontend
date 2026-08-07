@@ -122,7 +122,7 @@ export default function CreateDocumentPage() {
                 darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
             }`}>
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 text-sm">Preparing workspace...</p>
                 </div>
             </div>
@@ -174,7 +174,7 @@ export default function CreateDocumentPage() {
                         darkMode ? 'bg-slate-900/60 border-slate-800/80' : 'bg-white border-slate-200'
                     }`}>
                         <div className="flex items-center gap-3 mb-6">
-                            <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
+                            <div className={`p-2 rounded-lg ${darkMode ? 'bg-primary-500/10 text-primary-400' : 'bg-primary-100 text-primary-700'}`}>
                                 <FileText className="h-5 w-5" />
                             </div>
                             <h2 className="text-xl font-bold">Document Details</h2>
@@ -194,7 +194,7 @@ export default function CreateDocumentPage() {
                                     type="text"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className={`block w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                    className={`block w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-sm ${
                                         darkMode 
                                             ? 'bg-slate-950/50 border-slate-800 text-slate-100 placeholder-slate-600' 
                                             : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400'
@@ -210,7 +210,7 @@ export default function CreateDocumentPage() {
                                 <select
                                     value={documentType}
                                     onChange={(e) => setDocumentType(e.target.value)}
-                                    className={`block w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                    className={`block w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-sm ${
                                         darkMode 
                                             ? 'bg-slate-950/50 border-slate-800 text-slate-100' 
                                             : 'bg-slate-100/50 border-slate-200 text-slate-900'
@@ -230,7 +230,7 @@ export default function CreateDocumentPage() {
                                 <select
                                     value={projectId}
                                     onChange={(e) => setProjectId(e.target.value)}
-                                    className={`block w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                    className={`block w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-sm ${
                                         darkMode 
                                             ? 'bg-slate-950/50 border-slate-800 text-slate-100' 
                                             : 'bg-slate-100/50 border-slate-200 text-slate-900'
@@ -266,7 +266,7 @@ export default function CreateDocumentPage() {
                                     <label htmlFor="file-upload" className="cursor-pointer">
                                         <div className="flex flex-col items-center justify-center">
                                             <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                                            <span className="text-sm font-semibold block text-emerald-500">
+                                            <span className="text-sm font-semibold block text-primary-500">
                                                 {file ? file.name : "Click to select a file"}
                                             </span>
                                             <span className="text-xs text-slate-500 mt-1">Supports PDF, DOC, XLS up to 10MB</span>
@@ -279,7 +279,7 @@ export default function CreateDocumentPage() {
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg shadow-emerald-500/10 text-sm"
+                                className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg shadow-primary-500/10 text-sm"
                             >
                                 {submitting ? 'Creating draft...' : 'Create Draft'}
                                 {!submitting && <Send className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}

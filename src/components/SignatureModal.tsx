@@ -304,7 +304,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                                 <button 
                                     onClick={handleSubmit}
                                     disabled={submitting}
-                                    className="flex flex-1 items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 transition-colors disabled:opacity-50"
+                                    className="flex flex-1 items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white bg-gradient-to-r from-primary-500 to-teal-500 hover:from-primary-400 hover:to-teal-400 transition-colors disabled:opacity-50"
                                 >
                                     {submitting ? (
                                         <UploadCloud className="w-4 h-4 animate-bounce" />

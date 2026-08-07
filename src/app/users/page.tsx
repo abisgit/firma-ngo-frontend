@@ -155,8 +155,8 @@ export default function UserManagementPage() {
                         onClick={toggleTheme}
                         className={`p-2.5 rounded-xl border transition-all duration-200 ${
                             darkMode 
-                                ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-emerald-400 hover:bg-slate-800' 
-                                : 'bg-white border-slate-200 text-slate-500 hover:text-emerald-600 hover:bg-slate-50'
+                                ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-primary-400 hover:bg-slate-800' 
+                                : 'bg-white border-slate-200 text-slate-500 hover:text-primary-600 hover:bg-slate-50'
                         }`}
                     >
                         {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -167,7 +167,7 @@ export default function UserManagementPage() {
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className={`text-2xl font-bold flex items-center ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
-                                <ShieldCheck className={`w-8 h-8 mr-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                                <ShieldCheck className={`w-8 h-8 mr-3 ${darkMode ? 'text-primary-400' : 'text-primary-600'}`} />
                                 User Management & Permissions
                     </h1>
                     <p className="text-slate-500 mt-1">Manage hospital staff roles and granular access controls.</p>

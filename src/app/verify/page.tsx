@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
@@ -21,6 +21,7 @@ export default function VerificationPage() {
     const [fileInput, setFileInput] = useState<File | null>(null);
 
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
@@ -32,24 +33,37 @@ export default function VerificationPage() {
 
         const fetchData = async () => {
             const token = localStorage.getItem('token');
-            if (!token) {
-                router.push('/login');
-                return;
+            if (token) {
+                try {
+                    const userData = await getMe();
+                    setUser(userData);
+                } catch (err) {
+                    console.error('Error fetching verification portal data:', err);
+                }
             }
-
-            try {
-                const userData = await getMe();
-                setUser(userData);
-            } catch (err) {
-                console.error('Error fetching verification portal data:', err);
-                router.push('/login');
-            } finally {
-                setLoading(false);
-            }
+            setLoading(false);
         };
 
         fetchData();
-    }, [router]);
+
+        // Check if hash is in URL and auto-verify
+        const hashFromUrl = searchParams.get('hash');
+        if (hashFromUrl) {
+            setHashInput(hashFromUrl);
+            const autoVerify = async () => {
+                setSearching(true);
+                try {
+                    const res = await api.post('/verify', { hash: hashFromUrl });
+                    setResult(res.data.document);
+                } catch (err: any) {
+                    setError(err.response?.data?.message || 'No matching anchored record found on the ledger.');
+                } finally {
+                    setSearching(false);
+                }
+            };
+            autoVerify();
+        }
+    }, [router, searchParams]);
 
     const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -105,7 +119,7 @@ export default function VerificationPage() {
             }`}>
                 <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />
                 <div className="flex-1 flex flex-col h-screen items-center justify-center">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 text-sm mt-4">Loading verification queue...</p>
                 </div>
             </div>
@@ -116,8 +130,8 @@ export default function VerificationPage() {
         <div className={`min-h-screen transition-colors duration-300 flex overflow-hidden ${
             darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
         }`}>
-            {/* Sidebar */}
-            <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />
+            {/* Sidebar (only show if logged in) */}
+            {user && <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />}
 
             {/* Main Section */}
             <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
@@ -148,7 +162,7 @@ export default function VerificationPage() {
                         darkMode ? 'bg-slate-900/60 border-slate-800/80' : 'bg-white border-slate-200'
                     }`}>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
+                            <div className={`p-2 rounded-lg ${darkMode ? 'bg-primary-500/10 text-primary-400' : 'bg-primary-100 text-primary-700'}`}>
                                 <SearchCheck className="h-5 w-5" />
                             </div>
                             <h2 className="text-xl font-bold">Verify Document Authenticity</h2>
@@ -163,7 +177,7 @@ export default function VerificationPage() {
                                 onClick={() => { setActiveTab('text'); setError(''); setResult(null); }}
                                 className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all ${
                                     activeTab === 'text'
-                                        ? 'border-emerald-500 text-emerald-500'
+                                        ? 'border-primary-500 text-primary-500'
                                         : 'border-transparent text-slate-500 hover:text-slate-700'
                                 }`}
                             >
@@ -173,7 +187,7 @@ export default function VerificationPage() {
                                 onClick={() => { setActiveTab('file'); setError(''); setResult(null); }}
                                 className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all ${
                                     activeTab === 'file'
-                                        ? 'border-emerald-500 text-emerald-500'
+                                        ? 'border-primary-500 text-primary-500'
                                         : 'border-transparent text-slate-500 hover:text-slate-700'
                                 }`}
                             >
@@ -187,7 +201,7 @@ export default function VerificationPage() {
                                     type="text"
                                     value={hashInput}
                                     onChange={(e) => setHashInput(e.target.value)}
-                                    className={`flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm ${
+                                    className={`flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all text-sm ${
                                         darkMode 
                                             ? 'bg-slate-950/50 border-slate-800 text-slate-100 placeholder-slate-600' 
                                             : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400 shadow-sm'
@@ -198,7 +212,7 @@ export default function VerificationPage() {
                                 <button
                                     type="submit"
                                     disabled={searching}
-                                    className="py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 shrink-0"
+                                    className="py-3 px-6 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 shrink-0"
                                 >
                                     {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
                                     Verify
@@ -225,7 +239,7 @@ export default function VerificationPage() {
                                     <label htmlFor="verify-file-upload" className="cursor-pointer">
                                         <div className="flex flex-col items-center justify-center">
                                             <Upload className="h-10 w-10 text-slate-400 mb-2" />
-                                            <span className="text-sm font-semibold block text-emerald-500">
+                                            <span className="text-sm font-semibold block text-primary-500">
                                                 {fileInput ? fileInput.name : "Select accounting file to audit"}
                                             </span>
                                             <span className="text-xs text-slate-500 mt-1">Upload the local file to scan its hash against the ledger</span>
@@ -235,7 +249,7 @@ export default function VerificationPage() {
                                 <button
                                     type="submit"
                                     disabled={searching || !fileInput}
-                                    className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                                    className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
                                 >
                                     {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
                                     Scan & Audit Document Trail
@@ -250,11 +264,11 @@ export default function VerificationPage() {
                             darkMode ? 'bg-slate-900/40 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
                         }`}>
                             {/* Verification Success Header */}
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-xl">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-primary-500/10 border border-primary-500/20 text-primary-500 rounded-xl">
                                 <ShieldCheck className="h-6 w-6 shrink-0" />
                                 <div>
                                     <h3 className="font-bold text-sm">Ledger Verification Succeeded</h3>
-                                    <p className="text-xs text-emerald-400/90 mt-0.5">The document hash matches an authentic anchored record on the ledger.</p>
+                                    <p className="text-xs text-primary-400/90 mt-0.5">The document hash matches an authentic anchored record on the ledger.</p>
                                 </div>
                             </div>
 
@@ -274,7 +288,7 @@ export default function VerificationPage() {
                                                         href={result.fileUrl.startsWith('http') ? result.fileUrl : `${api.defaults.baseURL}${result.fileUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 flex items-center gap-1 mt-1"
+                                                        className="text-xs font-semibold text-primary-500 hover:text-primary-400 flex items-center gap-1 mt-1"
                                                     >
                                                         <ExternalLink className="h-3 w-3" /> Open File
                                                     </a>
@@ -305,10 +319,10 @@ export default function VerificationPage() {
                                     
                                     <div className="space-y-3 text-sm">
                                         <div className="flex items-start gap-2.5">
-                                            <Anchor className="h-4 w-4 mt-0.5 text-emerald-500" />
+                                            <Anchor className="h-4 w-4 mt-0.5 text-primary-500" />
                                             <div className="min-w-0 flex-1">
                                                 <span className="block text-xs text-slate-500">SHA-256 Ledger Hash</span>
-                                                <span className="font-mono text-xs text-emerald-500 break-all select-all">{result.blockchainHash}</span>
+                                                <span className="font-mono text-xs text-primary-500 break-all select-all">{result.blockchainHash}</span>
                                             </div>
                                         </div>
 

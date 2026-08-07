@@ -8,12 +8,14 @@ import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
 import SignatureModal from '@/components/SignatureModal';
 import { FileText, Plus, Filter, CheckCircle, Clock, ShieldAlert, Award, Sun, Moon, ExternalLink } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function DocumentsPage() {
     const [user, setUser] = useState<any>(null);
     const [documents, setDocuments] = useState<any[]>([]);
     const [filteredDocs, setFilteredDocs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [firmaConnected, setFirmaConnected] = useState<boolean>(true);
     const [darkMode, setDarkMode] = useState(false);
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const [signatureDocumentId, setSignatureDocumentId] = useState('');
@@ -46,6 +48,14 @@ export default function DocumentsPage() {
                 const docsRes = await api.get('/documents');
                 setDocuments(docsRes.data);
                 setFilteredDocs(docsRes.data);
+
+                // Check FIRMA Core connection
+                try {
+                    const connRes = await api.get('/firma/connection-status');
+                    setFirmaConnected(connRes.data.connected);
+                } catch (e) {
+                    setFirmaConnected(false);
+                }
             } catch (err) {
                 console.error('Error fetching documents:', err);
                 router.push('/login');
@@ -85,7 +95,7 @@ export default function DocumentsPage() {
             case 'APPROVED':
                 return <span className={base + (darkMode ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" : "bg-blue-50 text-blue-700 border border-blue-100")}><CheckCircle className="h-3 w-3" /> Approved</span>;
             case 'ANCHORED':
-                return <span className={base + (darkMode ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-emerald-50 text-emerald-700 border-emerald-100")}><Award className="h-3 w-3" /> Anchored</span>;
+                return <span className={base + (darkMode ? "bg-primary-500/10 text-primary-400 border border-primary-500/20" : "bg-primary-50 text-primary-700 border-primary-100")}><Award className="h-3 w-3" /> Anchored</span>;
             default:
                 return <span className={base + "bg-slate-100 text-slate-600"}>{status}</span>;
         }
@@ -167,7 +177,7 @@ export default function DocumentsPage() {
                         {(user?.role === 'FIELD_OFFICER' || user?.role === 'SUPER_ADMIN') && (
                             <Link
                                 href="/documents/create"
-                                className="flex items-center gap-2 py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-emerald-400 hover:to-teal-400 text-xs shadow-md transition-all active:scale-95"
+                                className="flex items-center gap-2 py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all active:scale-95"
                             >
                                 <Plus className="h-4 w-4" /> Create Document
                             </Link>
@@ -182,7 +192,7 @@ export default function DocumentsPage() {
                         darkMode ? 'bg-slate-900/30 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
                     }`}>
                         <div className="flex items-center gap-2 text-sm font-semibold">
-                            <Filter className="h-4 w-4 text-emerald-500" />
+                            <Filter className="h-4 w-4 text-primary-500" />
                             <span>Filters:</span>
                         </div>
 
@@ -271,8 +281,8 @@ export default function DocumentsPage() {
                                                 rel="noopener noreferrer"
                                                 className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
                                                     darkMode
-                                                        ? 'bg-slate-950/40 border-slate-800 text-emerald-400 hover:bg-slate-900 hover:text-emerald-300'
-                                                        : 'bg-slate-50 border-slate-200 text-emerald-600 hover:bg-slate-100 hover:text-emerald-700'
+                                                        ? 'bg-slate-950/40 border-slate-800 text-primary-400 hover:bg-slate-900 hover:text-primary-300'
+                                                        : 'bg-slate-50 border-slate-200 text-primary-600 hover:bg-slate-100 hover:text-primary-700'
                                                 }`}
                                             >
                                                 <ExternalLink className="h-3.5 w-3.5" /> View Document File
@@ -292,16 +302,16 @@ export default function DocumentsPage() {
                                             </button>
                                         )}
 
-                                        {doc.status === 'APPROVED' && (
+                                        {doc.status === 'APPROVED' && firmaConnected && (
                                             <button
                                                 onClick={() => handleAnchor(doc.id)}
-                                                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
+                                                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-lg transition-all shadow-sm ${
                                                     darkMode
-                                                        ? 'bg-amber-950/40 border-amber-800 text-amber-400 hover:bg-amber-900 hover:text-amber-300'
-                                                        : 'bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-100 hover:text-amber-700'
+                                                        ? 'bg-primary-600 text-white hover:bg-primary-500'
+                                                        : 'bg-primary-600 text-white hover:bg-primary-700'
                                                 }`}
                                             >
-                                                <Award className="h-3.5 w-3.5" /> Anchor on Blockchain
+                                                <Award className="h-3.5 w-3.5" /> Anchor Document
                                             </button>
                                         )}
                                     </div>
@@ -312,10 +322,26 @@ export default function DocumentsPage() {
                                     darkMode ? 'border-slate-800/85 text-slate-500' : 'border-slate-100 text-slate-500'
                                 }`}>
                                     {doc.blockchainHash ? (
-                                        <div className="space-y-1">
-                                            <span className="block font-semibold uppercase tracking-wider text-[9px] text-emerald-500">Blockchain Ledger Proof</span>
-                                            <p className="font-mono truncate select-all">Hash: {doc.blockchainHash}</p>
-                                            <p className="font-mono truncate select-all">TxID: {doc.txId}</p>
+                                        <div className="flex flex-row gap-4">
+                                            <div className="shrink-0 p-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
+                                                <QRCodeSVG 
+                                                    value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3005'}/verify?hash=${doc.blockchainHash}`} 
+                                                    size={64} 
+                                                    bgColor={"#ffffff"}
+                                                    fgColor={"#000000"}
+                                                    level={"M"}
+                                                />
+                                            </div>
+                                            <div className="space-y-1 overflow-hidden flex flex-col justify-center">
+                                                <span className="block font-semibold uppercase tracking-wider text-[9px] text-primary-500">Blockchain Ledger Proof</span>
+                                                <p className="font-mono truncate select-all">Hash: {doc.blockchainHash}</p>
+                                                <p className="font-mono truncate select-all">TxID: {doc.txId}</p>
+                                            </div>
+                                        </div>
+                                    ) : !firmaConnected ? (
+                                        <div className={`flex items-center gap-2 p-2 rounded border ${darkMode ? 'bg-red-950/20 border-red-900 text-red-400' : 'bg-red-50 border-red-200 text-red-600'}`}>
+                                            <ShieldAlert className="h-4 w-4 shrink-0" />
+                                            <span className="font-semibold text-[11px]">FIRMA Core is disconnected. Anchoring unavailable.</span>
                                         </div>
                                     ) : (
                                         <p className="italic">No blockchain anchoring proof generated yet.</p>

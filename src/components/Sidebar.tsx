@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Shield, LayoutDashboard, Briefcase, FileText, CheckSquare, SearchCheck, LogOut, Sun, Moon, Users, Building2 } from 'lucide-react';
@@ -23,6 +24,27 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
             } catch (e) {}
         }
     }
+
+    const [organization, setOrganization] = useState<any>(() => {
+        if (typeof window !== 'undefined') {
+            const storedOrg = localStorage.getItem('organization');
+            if (storedOrg) return JSON.parse(storedOrg);
+        }
+        return null;
+    });
+
+    useEffect(() => {
+        if (user) {
+            import('@/lib/api').then(({ default: api }) => {
+                api.get('/organization/profile')
+                    .then(res => {
+                        setOrganization(res.data);
+                        localStorage.setItem('organization', JSON.stringify(res.data));
+                    })
+                    .catch(err => console.error('Failed to load organization for sidebar:', err));
+            });
+        }
+    }, [user]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -51,11 +73,17 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
             <div className="flex flex-col flex-1">
                 {/* Branding Logo */}
                 <div className="h-16 px-6 flex items-center gap-3 border-b border-inherit">
-                    <div className="p-1.5 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-md">
-                        <Shield className="h-5 w-5 text-slate-950" />
-                    </div>
+                    {organization?.themeLogoUrl ? (
+                        <div className="flex items-center justify-center">
+                            <img src={organization.themeLogoUrl.startsWith('http') ? organization.themeLogoUrl : `http://localhost:3004${organization.themeLogoUrl}`} alt="Org Logo" className="h-8 max-w-full object-contain" />
+                        </div>
+                    ) : (
+                        <div className="p-1.5 bg-gradient-to-tr from-primary-500 to-teal-400 rounded-md">
+                            <Shield className="h-5 w-5 text-slate-950" />
+                        </div>
+                    )}
                     <span className={`text-lg font-bold tracking-tight ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
-                        FIRMA-NGO
+                        {organization?.name || 'FIRMA-NGO'}
                     </span>
                 </div>
 
@@ -71,8 +99,8 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
                                 className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 ${
                                     isActive
                                         ? (darkMode 
-                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                                            : 'bg-emerald-50 text-emerald-700 border border-emerald-100')
+                                            ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20' 
+                                            : 'bg-primary-50 text-primary-700 border border-primary-100')
                                         : (darkMode 
                                             ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent' 
                                             : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent')
@@ -95,7 +123,7 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
                     }`}>
                         <div className="flex items-center gap-2">
                             <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                                darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-700'
+                                darkMode ? 'bg-primary-500/10 text-primary-400' : 'bg-primary-100 text-primary-700'
                             }`}>
                                 {user.firstName[0]}{user.lastName[0]}
                             </div>

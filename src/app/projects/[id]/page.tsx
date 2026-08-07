@@ -63,7 +63,7 @@ export default function ProjectDetailPage() {
                 darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
             }`}>
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 text-sm">Loading project details...</p>
                 </div>
             </div>
@@ -77,7 +77,7 @@ export default function ProjectDetailPage() {
             }`}>
                 <div className="text-center">
                     <h2 className="text-2xl font-bold mb-4">Project Not Found</h2>
-                    <Link href="/projects" className="text-emerald-500 hover:underline">
+                    <Link href="/projects" className="text-primary-500 hover:underline">
                         Return to Projects
                     </Link>
                 </div>
@@ -132,8 +132,8 @@ export default function ProjectDetailPage() {
                                 <div className="flex items-center gap-3 mb-4">
                                     <span className={`px-3 py-1 text-xs font-bold rounded-full border ${
                                         darkMode 
-                                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                            ? 'bg-primary-500/10 text-primary-400 border-primary-500/20' 
+                                            : 'bg-primary-50 text-primary-700 border-primary-200'
                                     }`}>
                                         {project.projectCode}
                                     </span>
@@ -156,7 +156,7 @@ export default function ProjectDetailPage() {
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-8 border-t ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                             <div className="flex items-center gap-4">
                                 <div className={`p-3 rounded-2xl ${darkMode ? 'bg-slate-950/60' : 'bg-slate-50'}`}>
-                                    <DollarSign className="h-6 w-6 text-emerald-500" />
+                                    <DollarSign className="h-6 w-6 text-primary-500" />
                                 </div>
                                 <div>
                                     <p className={`text-sm font-medium ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>Allocated Budget</p>
@@ -187,7 +187,7 @@ export default function ProjectDetailPage() {
                             }`}>
                                 <div className="flex items-center gap-4">
                                     <div className={`p-2 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
-                                        <FileText className="h-6 w-6 text-emerald-500" />
+                                        <FileText className="h-6 w-6 text-primary-500" />
                                     </div>
                                     <div>
                                         <h4 className="font-bold">{doc.title}</h4>
@@ -197,7 +197,7 @@ export default function ProjectDetailPage() {
                                     </div>
                                 </div>
                                 <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
-                                    doc.status === 'APPROVED' ? (darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600') :
+                                    doc.status === 'APPROVED' ? (darkMode ? 'bg-primary-500/10 text-primary-400' : 'bg-primary-50 text-primary-600') :
                                     doc.status === 'ANCHORED' ? (darkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600') :
                                     (darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600')
                                 }`}>
