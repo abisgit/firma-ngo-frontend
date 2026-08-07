@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
@@ -8,6 +8,18 @@ import Sidebar from '@/components/Sidebar';
 import { SearchCheck, Loader, ShieldCheck, ShieldAlert, Award, FileText, CheckCircle, User, Calendar, Anchor, Sun, Moon, ExternalLink, Upload } from 'lucide-react';
 
 export default function VerificationPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex h-screen items-center justify-center bg-slate-50">
+                <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <VerificationContent />
+        </Suspense>
+    );
+}
+
+function VerificationContent() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [searching, setSearching] = useState(false);
