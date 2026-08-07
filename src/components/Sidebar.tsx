@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, LayoutDashboard, Briefcase, FileText, CheckSquare, SearchCheck, LogOut, Sun, Moon } from 'lucide-react';
+import { Shield, LayoutDashboard, Briefcase, FileText, CheckSquare, SearchCheck, LogOut, Sun, Moon, Users, Building2 } from 'lucide-react';
 
 interface SidebarProps {
     darkMode: boolean;
@@ -10,9 +10,19 @@ interface SidebarProps {
     user: any;
 }
 
-export default function Sidebar({ darkMode, toggleTheme, user }: SidebarProps) {
+export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
+
+    let user = initialUser;
+    if (!user && typeof window !== 'undefined') {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                user = JSON.parse(storedUser);
+            } catch (e) {}
+        }
+    }
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -27,6 +37,11 @@ export default function Sidebar({ darkMode, toggleTheme, user }: SidebarProps) {
         { name: 'Approvals', path: '/approvals', icon: CheckSquare },
         { name: 'Verification', path: '/verify', icon: SearchCheck },
     ];
+
+    if (user?.role === 'SUPER_ADMIN' || user?.role === 'SYSTEM_ADMIN') {
+        menuItems.push({ name: 'User Management', path: '/users', icon: Users });
+        menuItems.push({ name: 'Organization Profile', path: '/profile', icon: Building2 });
+    }
 
     return (
         <aside className={`w-64 border-r shrink-0 flex flex-col justify-between transition-colors duration-300 relative z-30 ${

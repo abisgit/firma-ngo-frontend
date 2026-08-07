@@ -89,12 +89,13 @@ export default function ProjectsPage() {
 
     if (loading) {
         return (
-            <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+            <div className={`min-h-screen transition-colors duration-300 flex overflow-hidden ${
                 darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
             }`}>
-                <div className="flex flex-col items-center gap-4">
+                <Sidebar darkMode={darkMode} toggleTheme={toggleTheme} user={user} />
+                <div className="flex-1 flex flex-col h-screen items-center justify-center">
                     <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-slate-400 text-sm">Loading projects data...</p>
+                    <p className="text-slate-400 text-sm mt-4">Loading projects data...</p>
                 </div>
             </div>
         );

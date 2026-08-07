@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
+import SignatureModal from '@/components/SignatureModal';
 import { FileText, Plus, Filter, CheckCircle, Clock, ShieldAlert, Award, Sun, Moon, ExternalLink } from 'lucide-react';
 
 export default function DocumentsPage() {
@@ -14,6 +15,8 @@ export default function DocumentsPage() {
     const [filteredDocs, setFilteredDocs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
+    const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+    const [signatureDocumentId, setSignatureDocumentId] = useState('');
 
     // Filters
     const [statusFilter, setStatusFilter] = useState('ALL');
@@ -88,6 +91,40 @@ export default function DocumentsPage() {
         }
     };
 
+    const handleSign = (id: string) => {
+        setSignatureDocumentId(id);
+        setSignatureModalOpen(true);
+    };
+
+    const fetchDocuments = async () => {
+        try {
+            const docsRes = await api.get('/documents');
+            setDocuments(docsRes.data);
+            let results = [...docsRes.data];
+            if (statusFilter !== 'ALL') results = results.filter((doc: any) => doc.status === statusFilter);
+            if (typeFilter !== 'ALL') results = results.filter((doc: any) => doc.documentType === typeFilter);
+            setFilteredDocs(results);
+        } catch (err) {
+            console.error('Failed to fetch documents', err);
+        }
+    };
+
+    const handleAnchor = async (id: string) => {
+        try {
+            await api.post(`/documents/${id}/anchor`);
+            const docsRes = await api.get('/documents');
+            setDocuments(docsRes.data);
+            let results = [...docsRes.data];
+            if (statusFilter !== 'ALL') results = results.filter((doc: any) => doc.status === statusFilter);
+            if (typeFilter !== 'ALL') results = results.filter((doc: any) => doc.documentType === typeFilter);
+            setFilteredDocs(results);
+            alert('Document anchored on blockchain!');
+        } catch (err) {
+            console.error(err);
+            alert('Error anchoring document');
+        }
+    };
+
     return (
         <div className={`min-h-screen transition-colors duration-300 flex overflow-hidden ${
             darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
@@ -97,6 +134,15 @@ export default function DocumentsPage() {
 
             {/* Main Section */}
             <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
+                
+                <SignatureModal 
+                    isOpen={signatureModalOpen} 
+                    onClose={() => setSignatureModalOpen(false)} 
+                    onSuccess={fetchDocuments}
+                    documentId={signatureDocumentId}
+                    darkMode={darkMode}
+                />
+
                 {/* Header */}
                 <header className={`h-16 px-8 border-b flex items-center justify-between shrink-0 relative z-20 backdrop-blur-md ${
                     darkMode ? 'border-slate-900 bg-slate-900/10' : 'border-slate-200 bg-white/60'
@@ -217,20 +263,48 @@ export default function DocumentsPage() {
                                         <p>Creator: {doc.creator?.firstName} {doc.creator?.lastName} ({doc.creator?.role?.replace('_', ' ')})</p>
                                     </div>
 
-                                    {doc.fileUrl && (
-                                        <a
-                                            href={doc.fileUrl.startsWith('http') ? doc.fileUrl : `${api.defaults.baseURL}${doc.fileUrl}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className={`inline-flex items-center gap-1.5 mt-2 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
-                                                darkMode
-                                                    ? 'bg-slate-950/40 border-slate-800 text-emerald-400 hover:bg-slate-900 hover:text-emerald-300'
-                                                    : 'bg-slate-50 border-slate-200 text-emerald-600 hover:bg-slate-100 hover:text-emerald-700'
-                                            }`}
-                                        >
-                                            <ExternalLink className="h-3.5 w-3.5" /> View Document File
-                                        </a>
-                                    )}
+                                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                                        {doc.fileUrl && (
+                                            <a
+                                                href={doc.fileUrl.startsWith('http') ? doc.fileUrl : `${api.defaults.baseURL}${doc.fileUrl}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
+                                                    darkMode
+                                                        ? 'bg-slate-950/40 border-slate-800 text-emerald-400 hover:bg-slate-900 hover:text-emerald-300'
+                                                        : 'bg-slate-50 border-slate-200 text-emerald-600 hover:bg-slate-100 hover:text-emerald-700'
+                                                }`}
+                                            >
+                                                <ExternalLink className="h-3.5 w-3.5" /> View Document File
+                                            </a>
+                                        )}
+                                        
+                                        {doc.status === 'DRAFT' && (
+                                            <button
+                                                onClick={() => handleSign(doc.id)}
+                                                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
+                                                    darkMode
+                                                        ? 'bg-blue-950/40 border-blue-800 text-blue-400 hover:bg-blue-900 hover:text-blue-300'
+                                                        : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:text-blue-700'
+                                                }`}
+                                            >
+                                                <CheckCircle className="h-3.5 w-3.5" /> Sign Document
+                                            </button>
+                                        )}
+
+                                        {doc.status === 'APPROVED' && (
+                                            <button
+                                                onClick={() => handleAnchor(doc.id)}
+                                                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
+                                                    darkMode
+                                                        ? 'bg-amber-950/40 border-amber-800 text-amber-400 hover:bg-amber-900 hover:text-amber-300'
+                                                        : 'bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-100 hover:text-amber-700'
+                                                }`}
+                                            >
+                                                <Award className="h-3.5 w-3.5" /> Anchor on Blockchain
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Cryptographic Proof Log */}
@@ -252,7 +326,7 @@ export default function DocumentsPage() {
                                         <span>Signatures: {doc.signatures?.length || 0} applied</span>
                                         {doc.signatures?.length > 0 && (
                                             <span className={`text-[10px] font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                                Signed by {doc.signatures[0]?.signer?.firstName}
+                                                Signed by {doc.signatures[0]?.signer?.firstName} {doc.signatures[0]?.signer?.lastName} ({doc.signatures[0]?.signer?.role?.replace('_', ' ')})
                                             </span>
                                         )}
                                     </div>
