@@ -19,6 +19,9 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [stampType, setStampType] = useState('APPROVED');
+    const [idType, setIdType] = useState('NATIONAL_ID');
+    const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
+    const [idBackFile, setIdBackFile] = useState<File | null>(null);
     
     const videoRef = useRef<HTMLVideoElement>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -128,11 +131,31 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
             });
             const videoUrl = uploadRes.data.url;
 
+            let nationalIdFrontUrl = null;
+            let nationalIdBackUrl = null;
+
+            if (idFrontFile) {
+                const frontFormData = new FormData();
+                frontFormData.append('video', idFrontFile, idFrontFile.name);
+                const frontRes = await api.post('/upload-video', frontFormData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                nationalIdFrontUrl = frontRes.data.url;
+            }
+
+            if (idBackFile) {
+                const backFormData = new FormData();
+                backFormData.append('video', idBackFile, idBackFile.name);
+                const backRes = await api.post('/upload-video', backFormData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                nationalIdBackUrl = backRes.data.url;
+            }
+
             // 2. Sign document
             await api.post(`/documents/${documentId}/sign`, { 
                 videoUrl,
                 signatureImage,
-                stampType
+                stampType,
+                idType,
+                nationalIdFrontUrl,
+                nationalIdBackUrl
             });
             
             onSuccess();
@@ -222,6 +245,39 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                     {/* Stamp and Signature Area (Shown after video is recorded) */}
                     {videoBlob && (
                         <div className="w-full flex flex-col gap-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex flex-col gap-4 mb-2">
+                                <label className={`block text-xs font-bold uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    Identity Verification
+                                </label>
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>ID Type</label>
+                                        <select 
+                                            value={idType}
+                                            onChange={(e) => setIdType(e.target.value)}
+                                            className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                                darkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                                            }`}
+                                        >
+                                            <option value="NATIONAL_ID">National ID</option>
+                                            <option value="PASSPORT">Passport</option>
+                                            <option value="DRIVING_LICENSE">Driving License</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex-1 flex flex-col gap-2">
+                                        <div>
+                                            <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Front Page</label>
+                                            <input type="file" accept="image/*" onChange={(e) => setIdFrontFile(e.target.files?.[0] || null)} className={`w-full text-xs file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} />
+                                        </div>
+                                        <div>
+                                            <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Back Page</label>
+                                            <input type="file" accept="image/*" onChange={(e) => setIdBackFile(e.target.files?.[0] || null)} className={`w-full text-xs file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="h-px w-full bg-slate-200 dark:bg-slate-800 mb-2"></div>
+                            
                             <div className="flex gap-4">
                                 <div className="flex-1">
                                     <label className={`block text-xs font-bold mb-2 uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
