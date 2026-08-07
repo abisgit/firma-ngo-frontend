@@ -99,13 +99,9 @@ export default function OrganizationProfilePage() {
         try {
             let finalLogoUrl = organization.themeLogoUrl;
             
-            if (logoFile) {
-                const formData = new FormData();
-                formData.append('logo', logoFile);
-                const uploadRes = await api.post('/upload-logo', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-                finalLogoUrl = uploadRes.data.url;
+            // Send the base64 string directly to avoid ephemeral disk issues on Vercel
+            if (logoFile && logoPreview) {
+                finalLogoUrl = logoPreview;
             }
 
             const updateRes = await api.put('/organization/profile', {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getMe } from '@/lib/api';
@@ -106,7 +106,33 @@ export default function DocumentsPage() {
         setSignatureModalOpen(true);
     };
 
-    const fetchDocuments = async () => {
+    const handleViewDocument = (e: React.MouseEvent, fileUrl: string) => {
+        e.preventDefault();
+        if (fileUrl.startsWith('data:')) {
+            try {
+                const parts = fileUrl.split(';base64,');
+                const contentType = parts[0].split(':')[1];
+                const raw = window.atob(parts[1]);
+                const rawLength = raw.length;
+                const uInt8Array = new Uint8Array(rawLength);
+                for (let i = 0; i < rawLength; ++i) {
+                    uInt8Array[i] = raw.charCodeAt(i);
+                }
+                const blob = new Blob([uInt8Array], { type: contentType });
+                const blobUrl = URL.createObjectURL(blob);
+                window.open(blobUrl, '_blank');
+            } catch (err) {
+                console.error('Error opening base64 document:', err);
+                alert('Could not open the document.');
+            }
+        } else {
+            const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+            const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${baseUrl}${fileUrl}`;
+            window.open(fullUrl, '_blank');
+        }
+    };
+
+    const fetchDocuments = useCallback(async () => {
         try {
             const docsRes = await api.get('/documents');
             setDocuments(docsRes.data);
@@ -275,10 +301,8 @@ export default function DocumentsPage() {
 
                                     <div className="flex flex-wrap items-center gap-2 mt-2">
                                         {doc.fileUrl && (
-                                            <a
-                                                href={doc.fileUrl.startsWith('http') ? doc.fileUrl : `${api.defaults.baseURL}${doc.fileUrl}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <button
+                                                onClick={(e) => handleViewDocument(e, doc.fileUrl)}
                                                 className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
                                                     darkMode
                                                         ? 'bg-slate-950/40 border-slate-800 text-primary-400 hover:bg-slate-900 hover:text-primary-300'
@@ -286,7 +310,7 @@ export default function DocumentsPage() {
                                                 }`}
                                             >
                                                 <ExternalLink className="h-3.5 w-3.5" /> View Document File
-                                            </a>
+                                            </button>
                                         )}
                                         
                                         {doc.status === 'DRAFT' && (

@@ -83,17 +83,14 @@ export default function CreateDocumentPage() {
         try {
             let uploadedFileUrl = '/uploads/sample_proposal.pdf';
 
-            // If a file is selected, upload it to the backend first
+            // If a file is selected, convert to base64
             if (file) {
-                const formData = new FormData();
-                formData.append('file', file);
-
-                const uploadRes = await api.post('/upload', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
+                uploadedFileUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target?.result as string);
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsDataURL(file);
                 });
-                uploadedFileUrl = uploadRes.data.fileUrl;
             }
 
             await api.post('/documents', {
