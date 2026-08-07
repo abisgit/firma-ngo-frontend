@@ -43,7 +43,8 @@ export default function OrganizationProfilePage() {
                 secondaryColor: res.data.secondaryColor || '#047857',
             });
             if (res.data.themeLogoUrl) {
-                setLogoPreview(res.data.themeLogoUrl.startsWith('http') ? res.data.themeLogoUrl : `http://localhost:3004${res.data.themeLogoUrl}`);
+                const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+                setLogoPreview(res.data.themeLogoUrl.startsWith('http') ? res.data.themeLogoUrl : `${baseUrl}${res.data.themeLogoUrl}`);
             }
         } catch (error) {
             console.error("Failed to fetch organization", error);
@@ -116,7 +117,8 @@ export default function OrganizationProfilePage() {
 
             setOrganization(updateRes.data);
             if (updateRes.data.themeLogoUrl) {
-                setLogoPreview(updateRes.data.themeLogoUrl.startsWith('http') ? updateRes.data.themeLogoUrl : `http://localhost:3004${updateRes.data.themeLogoUrl}`);
+                const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+                setLogoPreview(updateRes.data.themeLogoUrl.startsWith('http') ? updateRes.data.themeLogoUrl : `${baseUrl}${updateRes.data.themeLogoUrl}`);
             }
             setIsEditing(false);
             
@@ -277,7 +279,8 @@ export default function OrganizationProfilePage() {
                                             <button 
                                                 onClick={() => {
                                                     setIsEditing(false);
-                                                    setLogoPreview(organization.themeLogoUrl ? (organization.themeLogoUrl.startsWith('http') ? organization.themeLogoUrl : `http://localhost:3004${organization.themeLogoUrl}`) : null);
+                                                    const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+                                                    setLogoPreview(organization.themeLogoUrl ? (organization.themeLogoUrl.startsWith('http') ? organization.themeLogoUrl : `${baseUrl}${organization.themeLogoUrl}`) : null);
                                                     setLogoFile(null);
                                                     setEditForm({
                                                         name: organization.name,

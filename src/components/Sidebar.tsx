@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Shield, LayoutDashboard, Briefcase, FileText, CheckSquare, SearchCheck, LogOut, Sun, Moon, Users, Building2 } from 'lucide-react';
+import api from '@/lib/api';
 
 interface SidebarProps {
     darkMode: boolean;
@@ -74,8 +75,8 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
                 {/* Branding Logo */}
                 <div className="h-16 px-6 flex items-center gap-3 border-b border-inherit">
                     {organization?.themeLogoUrl ? (
-                        <div className="flex items-center justify-center">
-                            <img src={organization.themeLogoUrl.startsWith('http') ? organization.themeLogoUrl : `http://localhost:3004${organization.themeLogoUrl}`} alt="Org Logo" className="h-8 max-w-full object-contain" />
+                        <div className="flex justify-center w-full bg-white/10 p-2 rounded-xl backdrop-blur-sm">
+                            <img src={organization.themeLogoUrl.startsWith('http') ? organization.themeLogoUrl : `${api.defaults.baseURL || 'http://localhost:3004'}${organization.themeLogoUrl}`} alt="Org Logo" className="h-8 max-w-full object-contain" />
                         </div>
                     ) : (
                         <div className="p-1.5 bg-gradient-to-tr from-primary-500 to-teal-400 rounded-md">
