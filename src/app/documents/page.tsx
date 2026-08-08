@@ -126,7 +126,7 @@ export default function DocumentsPage() {
                 alert('Could not open the document.');
             }
         } else {
-            const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+            const baseUrl = api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app';
             const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${baseUrl}${fileUrl}`;
             window.open(fullUrl, '_blank');
         }

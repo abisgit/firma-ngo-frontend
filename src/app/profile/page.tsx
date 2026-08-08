@@ -43,7 +43,7 @@ export default function OrganizationProfilePage() {
                 secondaryColor: res.data.secondaryColor || '#047857',
             });
             if (res.data.themeLogoUrl) {
-                const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+                const baseUrl = api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app';
                 setLogoPreview(res.data.themeLogoUrl.startsWith('http') || res.data.themeLogoUrl.startsWith('data:') ? res.data.themeLogoUrl : `${baseUrl}${res.data.themeLogoUrl}`);
             }
         } catch (error) {
@@ -113,7 +113,7 @@ export default function OrganizationProfilePage() {
 
             setOrganization(updateRes.data);
             if (updateRes.data.themeLogoUrl) {
-                const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+                const baseUrl = api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app';
                 setLogoPreview(updateRes.data.themeLogoUrl.startsWith('http') || updateRes.data.themeLogoUrl.startsWith('data:') ? updateRes.data.themeLogoUrl : `${baseUrl}${updateRes.data.themeLogoUrl}`);
             }
             setIsEditing(false);
@@ -275,7 +275,7 @@ export default function OrganizationProfilePage() {
                                             <button 
                                                 onClick={() => {
                                                     setIsEditing(false);
-                                                    const baseUrl = api.defaults.baseURL || 'http://localhost:3004';
+                                                    const baseUrl = api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app';
                                                     setLogoPreview(organization.themeLogoUrl ? (organization.themeLogoUrl.startsWith('http') || organization.themeLogoUrl.startsWith('data:') ? organization.themeLogoUrl : `${baseUrl}${organization.themeLogoUrl}`) : null);
                                                     setLogoFile(null);
                                                     setEditForm({

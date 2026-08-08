@@ -293,7 +293,7 @@ function VerificationContent() {
                                         </div>
                                         {result.organization.themeLogoUrl && (
                                             <img 
-                                                src={result.organization.themeLogoUrl.startsWith('http') || result.organization.themeLogoUrl.startsWith('data:') ? result.organization.themeLogoUrl : `${api.defaults.baseURL || 'http://localhost:3004'}${result.organization.themeLogoUrl}`} 
+                                                src={result.organization.themeLogoUrl.startsWith('http') || result.organization.themeLogoUrl.startsWith('data:') ? result.organization.themeLogoUrl : `${api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app'}${result.organization.themeLogoUrl}`} 
                                                 alt="Organization Logo" 
                                                 className="h-8 w-auto object-contain" 
                                             />
@@ -315,7 +315,7 @@ function VerificationContent() {
                                                 <span className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{result.document.title}</span>
                                                 {result.document.fileUrl && (
                                                     <a
-                                                        href={result.document.fileUrl.startsWith('http') || result.document.fileUrl.startsWith('data:') ? result.document.fileUrl : `${api.defaults.baseURL || 'http://localhost:3004'}${result.document.fileUrl}`}
+                                                        href={result.document.fileUrl.startsWith('http') || result.document.fileUrl.startsWith('data:') ? result.document.fileUrl : `${api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app'}${result.document.fileUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-xs font-semibold text-primary-500 hover:text-primary-400 flex items-center gap-1 mt-1"

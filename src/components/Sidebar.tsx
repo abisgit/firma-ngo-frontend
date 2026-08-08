@@ -76,7 +76,7 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
                 <div className="h-16 px-6 flex items-center gap-3 border-b border-inherit">
                     {organization?.themeLogoUrl ? (
                         <div className="flex justify-center w-full bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-                            <img src={organization.themeLogoUrl.startsWith('http') || organization.themeLogoUrl.startsWith('data:') ? organization.themeLogoUrl : `${api.defaults.baseURL || 'http://localhost:3004'}${organization.themeLogoUrl}`} alt="Org Logo" className="h-8 max-w-full object-contain" />
+                            <img src={organization.themeLogoUrl.startsWith('http') || organization.themeLogoUrl.startsWith('data:') ? organization.themeLogoUrl : `${api.defaults.baseURL || 'https://firma-ngo-backend.vercel.app'}${organization.themeLogoUrl}`} alt="Org Logo" className="h-8 max-w-full object-contain" />
                         </div>
                     ) : (
                         <div className="p-1.5 bg-gradient-to-tr from-primary-500 to-teal-400 rounded-md">
