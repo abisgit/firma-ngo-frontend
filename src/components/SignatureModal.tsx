@@ -154,7 +154,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
     };
 
     const handleSubmit = async () => {
-        if (!isVerified && !videoBlob) {
+        if (!videoBlob) {
             setError('Please record a video consent first.');
             return;
         }
@@ -168,18 +168,19 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
         setError('');
 
         try {
+            // 1. Upload video (and ID if not verified) to verify identity
+            const formData = new FormData();
+            formData.append('video', videoBlob!);
+            
             if (!isVerified) {
-                // 1. Upload video and ID to verify identity
-                const formData = new FormData();
-                formData.append('video', videoBlob!);
                 formData.append('idType', idType);
                 if (idFrontFile) formData.append('idFront', await compressImage(idFrontFile));
                 if (idBackFile) formData.append('idBack', await compressImage(idBackFile));
-                
-                await api.post('/proxy-identity-verify', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
             }
+            
+            await api.post('/proxy-identity-verify', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
 
             // 2. Sign document
             await api.post(`/documents/${documentId}/sign`, { 
@@ -228,19 +229,19 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                         <div className="w-full flex items-center justify-center p-8">
                             <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
                         </div>
-                    ) : !isVerified && (
+                    ) : (
                         <>
-                            <p className={`text-sm text-center mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                                To apply a legally binding signature, please record a short 5-second video clearly stating your name and your consent to approve this document.
-                            </p>
-
                             {error && (
                                 <div className="mb-4 w-full p-3 text-sm rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 text-center">
                                     {error}
                                 </div>
                             )}
 
-                            {/* Video Area */}
+                            {/* Video Area (Always visible) */}
+                            <p className={`text-sm text-center mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                To apply a legally binding signature, please record a short 5-second video clearly stating your name and your consent to approve this document.
+                            </p>
+
                             <div className={`relative w-full aspect-video rounded-xl overflow-hidden mb-6 flex items-center justify-center ${
                                 darkMode ? 'bg-slate-950' : 'bg-slate-100'
                             }`}>
@@ -279,8 +280,8 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                         </>
                     )}
 
-                    {/* Stamp and Signature Area (Shown after video is recorded, or immediately if verified) */}
-                    {(videoBlob || isVerified) && (
+                    {/* Stamp and Signature Area (Shown after video is recorded) */}
+                    {videoBlob && (
                         <div className="w-full flex flex-col gap-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             {!isVerified && (
                                 <div className="flex flex-col gap-4 mb-2">
@@ -315,6 +316,15 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                                     </div>
                                 </div>
                             )}
+                            
+                            {isVerified && (
+                                <div className="flex items-center gap-2 mb-2 p-3 rounded-lg bg-green-50 text-green-700 border border-green-200">
+                                    <CheckCircle className="w-5 h-5" />
+                                    <span className="text-sm font-medium">National ID Verified securely via FIRMA Core</span>
+                                </div>
+                            )}
+
+                            {/* Signature Actions */}
                             <div className="h-px w-full bg-slate-200 dark:bg-slate-800 mb-2"></div>
                             
                             <div className="flex gap-4">
