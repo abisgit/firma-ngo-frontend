@@ -22,6 +22,8 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
     const [idType, setIdType] = useState('NATIONAL_ID');
     const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
     const [idBackFile, setIdBackFile] = useState<File | null>(null);
+    const [isVerified, setIsVerified] = useState(false);
+    const [loadingIdentity, setLoadingIdentity] = useState(true);
     
     const videoRef = useRef<HTMLVideoElement>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -33,6 +35,20 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
             stopCamera();
             setVideoBlob(null);
             setError('');
+        } else {
+            // Check identity status
+            const checkIdentity = async () => {
+                setLoadingIdentity(true);
+                try {
+                    const res = await api.get('/auth/me');
+                    setIsVerified(!!res.data.isIdentityVerified);
+                } catch (err) {
+                    console.error('Error checking identity:', err);
+                } finally {
+                    setLoadingIdentity(false);
+                }
+            };
+            checkIdentity();
         }
     }, [isOpen]);
 
@@ -108,7 +124,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
     };
 
     const handleSubmit = async () => {
-        if (!videoBlob) {
+        if (!isVerified && !videoBlob) {
             setError('Please record a video consent first.');
             return;
         }
@@ -122,40 +138,23 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
         setError('');
 
         try {
-            // 1. Upload video
-            const formData = new FormData();
-            formData.append('video', videoBlob, `consent-${documentId}.webm`);
-            
-            const uploadRes = await api.post('/upload-video', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            const videoUrl = uploadRes.data.url;
-
-            let nationalIdFrontUrl = null;
-            let nationalIdBackUrl = null;
-
-            if (idFrontFile) {
-                const frontFormData = new FormData();
-                frontFormData.append('video', idFrontFile, idFrontFile.name);
-                const frontRes = await api.post('/upload-video', frontFormData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                nationalIdFrontUrl = frontRes.data.url;
-            }
-
-            if (idBackFile) {
-                const backFormData = new FormData();
-                backFormData.append('video', idBackFile, idBackFile.name);
-                const backRes = await api.post('/upload-video', backFormData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                nationalIdBackUrl = backRes.data.url;
+            if (!isVerified) {
+                // 1. Upload video and ID to verify identity
+                const formData = new FormData();
+                formData.append('video', videoBlob!);
+                formData.append('idType', idType);
+                if (idFrontFile) formData.append('idFront', idFrontFile);
+                if (idBackFile) formData.append('idBack', idBackFile);
+                
+                await api.post('/api/identity/verify', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
             }
 
             // 2. Sign document
             await api.post(`/documents/${documentId}/sign`, { 
-                videoUrl,
                 signatureImage,
-                stampType,
-                idType,
-                nationalIdFrontUrl,
-                nationalIdBackUrl
+                stampType
             });
             
             onSuccess();
@@ -195,87 +194,97 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
 
                 {/* Content */}
                 <div className="p-6 flex flex-col items-center">
-                    <p className={`text-sm text-center mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                        To apply a legally binding signature, please record a short 5-second video clearly stating your name and your consent to approve this document.
-                    </p>
-
-                    {error && (
-                        <div className="mb-4 w-full p-3 text-sm rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 text-center">
-                            {error}
+                    {loadingIdentity ? (
+                        <div className="w-full flex items-center justify-center p-8">
+                            <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
                         </div>
+                    ) : !isVerified && (
+                        <>
+                            <p className={`text-sm text-center mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                To apply a legally binding signature, please record a short 5-second video clearly stating your name and your consent to approve this document.
+                            </p>
+
+                            {error && (
+                                <div className="mb-4 w-full p-3 text-sm rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 text-center">
+                                    {error}
+                                </div>
+                            )}
+
+                            {/* Video Area */}
+                            <div className={`relative w-full aspect-video rounded-xl overflow-hidden mb-6 flex items-center justify-center ${
+                                darkMode ? 'bg-slate-950' : 'bg-slate-100'
+                            }`}>
+                                {!videoBlob && (
+                                    <video 
+                                        ref={videoRef} 
+                                        autoPlay 
+                                        muted 
+                                        playsInline
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
+                                
+                                {videoBlob && (
+                                    <video 
+                                        src={URL.createObjectURL(videoBlob)} 
+                                        controls 
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
+
+                                {!videoBlob && !streamRef.current && !recording && (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-2">
+                                        <Video className="w-8 h-8 opacity-50" />
+                                        <span className="text-sm font-medium">Camera off</span>
+                                    </div>
+                                )}
+
+                                {recording && (
+                                    <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/90 text-white text-xs font-bold animate-pulse">
+                                        <div className="w-2 h-2 rounded-full bg-white" />
+                                        RECORDING
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
 
-                    {/* Video Area */}
-                    <div className={`relative w-full aspect-video rounded-xl overflow-hidden mb-6 flex items-center justify-center ${
-                        darkMode ? 'bg-slate-950' : 'bg-slate-100'
-                    }`}>
-                        {!videoBlob && (
-                            <video 
-                                ref={videoRef} 
-                                autoPlay 
-                                muted 
-                                playsInline
-                                className="w-full h-full object-cover"
-                            />
-                        )}
-                        
-                        {videoBlob && (
-                            <video 
-                                src={URL.createObjectURL(videoBlob)} 
-                                controls 
-                                className="w-full h-full object-cover"
-                            />
-                        )}
-
-                        {!videoBlob && !streamRef.current && !recording && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-2">
-                                <Video className="w-8 h-8 opacity-50" />
-                                <span className="text-sm font-medium">Camera off</span>
-                            </div>
-                        )}
-
-                        {recording && (
-                            <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/90 text-white text-xs font-bold animate-pulse">
-                                <div className="w-2 h-2 rounded-full bg-white" />
-                                RECORDING
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Stamp and Signature Area (Shown after video is recorded) */}
-                    {videoBlob && (
+                    {/* Stamp and Signature Area (Shown after video is recorded, or immediately if verified) */}
+                    {(videoBlob || isVerified) && (
                         <div className="w-full flex flex-col gap-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="flex flex-col gap-4 mb-2">
-                                <label className={`block text-xs font-bold uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    Identity Verification
-                                </label>
-                                <div className="flex gap-4">
-                                    <div className="flex-1">
-                                        <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>ID Type</label>
-                                        <select 
-                                            value={idType}
-                                            onChange={(e) => setIdType(e.target.value)}
-                                            className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                                darkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
-                                            }`}
-                                        >
-                                            <option value="NATIONAL_ID">National ID</option>
-                                            <option value="PASSPORT">Passport</option>
-                                            <option value="DRIVING_LICENSE">Driving License</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex-1 flex flex-col gap-2">
-                                        <div>
-                                            <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Front Page</label>
-                                            <input type="file" accept="image/*" onChange={(e) => setIdFrontFile(e.target.files?.[0] || null)} className={`w-full text-xs file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} />
+                            {!isVerified && (
+                                <div className="flex flex-col gap-4 mb-2">
+                                    <label className={`block text-xs font-bold uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        Identity Verification
+                                    </label>
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>ID Type</label>
+                                            <select 
+                                                value={idType}
+                                                onChange={(e) => setIdType(e.target.value)}
+                                                className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                                    darkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                                                }`}
+                                            >
+                                                <option value="NATIONAL_ID">National ID</option>
+                                                <option value="PASSPORT">Passport</option>
+                                                <option value="DRIVING_LICENSE">Driving License</option>
+                                            </select>
                                         </div>
-                                        <div>
-                                            <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Back Page</label>
-                                            <input type="file" accept="image/*" onChange={(e) => setIdBackFile(e.target.files?.[0] || null)} className={`w-full text-xs file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} />
+                                        <div className="flex-1 flex flex-col gap-2">
+                                            <div>
+                                                <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Front Page</label>
+                                                <input type="file" accept="image/*" onChange={(e) => setIdFrontFile(e.target.files?.[0] || null)} className={`w-full text-xs file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} />
+                                            </div>
+                                            <div>
+                                                <label className={`block text-[10px] mb-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Back Page</label>
+                                                <input type="file" accept="image/*" onChange={(e) => setIdBackFile(e.target.files?.[0] || null)} className={`w-full text-xs file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                             <div className="h-px w-full bg-slate-200 dark:bg-slate-800 mb-2"></div>
                             
                             <div className="flex gap-4">
@@ -327,7 +336,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
 
                     {/* Controls */}
                     <div className="flex justify-center gap-4 w-full">
-                        {!videoBlob ? (
+                        {loadingIdentity ? null : (!videoBlob && !isVerified) ? (
                             recording ? (
                                 <button 
                                     onClick={stopRecording}
@@ -345,21 +354,23 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                             )
                         ) : (
                             <>
-                                <button 
-                                    onClick={retakeVideo}
-                                    disabled={submitting}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-colors ${
-                                        darkMode 
-                                            ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                    }`}
-                                >
-                                    <RefreshCw className="w-4 h-4" /> Retake
-                                </button>
+                                {!isVerified && (
+                                    <button 
+                                        onClick={retakeVideo}
+                                        disabled={submitting}
+                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-colors ${
+                                            darkMode 
+                                                ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
+                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        }`}
+                                    >
+                                        <RefreshCw className="w-4 h-4" /> Retake
+                                    </button>
+                                )}
                                 
                                 <button 
                                     onClick={handleSubmit}
-                                    disabled={submitting}
+                                    disabled={submitting || (!isVerified && (!videoBlob || !idFrontFile || !idBackFile))}
                                     className="flex flex-1 items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white bg-gradient-to-r from-primary-500 to-teal-500 hover:from-primary-400 hover:to-teal-400 transition-colors disabled:opacity-50"
                                 >
                                     {submitting ? (
