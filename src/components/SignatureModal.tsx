@@ -176,7 +176,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                 if (idFrontFile) formData.append('idFront', await compressImage(idFrontFile));
                 if (idBackFile) formData.append('idBack', await compressImage(idBackFile));
                 
-                await api.post('/api/identity/verify', formData, {
+                await api.post('/proxy-identity-verify', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
             }
