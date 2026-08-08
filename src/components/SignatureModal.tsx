@@ -178,14 +178,20 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                 if (idBackFile) formData.append('idBack', await compressImage(idBackFile));
             }
             
-            await api.post('/proxy-identity-verify', formData, {
+            const verifyRes = await api.post('/proxy-identity-verify', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
+
+            const { videoUrl, nationalIdFrontUrl, nationalIdBackUrl, idType: returnedIdType } = verifyRes.data;
 
             // 2. Sign document
             await api.post(`/documents/${documentId}/sign`, { 
                 signatureImage,
-                stampType
+                stampType,
+                videoUrl,
+                nationalIdFrontUrl,
+                nationalIdBackUrl,
+                idType: returnedIdType
             });
             
             onSuccess();
