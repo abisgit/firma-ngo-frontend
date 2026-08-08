@@ -79,7 +79,11 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
     };
 
     const beginRecording = (stream: MediaStream) => {
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        let options: MediaRecorderOptions = { mimeType: 'video/webm' };
+        if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+            options = { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 250000 };
+        }
+        const mediaRecorder = new MediaRecorder(stream, options);
         mediaRecorderRef.current = mediaRecorder;
         
         const chunks: BlobPart[] = [];
@@ -109,6 +113,32 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
             mediaRecorderRef.current.stop();
             setRecording(false);
         }
+    };
+
+    const compressImage = async (file: File): Promise<File> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                    } else {
+                        reject(new Error('Canvas to Blob failed'));
+                    }
+                }, 'image/jpeg', 0.6); // 60% quality
+            };
+            img.onerror = (error) => reject(error);
+        });
     };
 
     const stopCamera = () => {
@@ -143,8 +173,8 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                 const formData = new FormData();
                 formData.append('video', videoBlob!);
                 formData.append('idType', idType);
-                if (idFrontFile) formData.append('idFront', idFrontFile);
-                if (idBackFile) formData.append('idBack', idBackFile);
+                if (idFrontFile) formData.append('idFront', await compressImage(idFrontFile));
+                if (idBackFile) formData.append('idBack', await compressImage(idBackFile));
                 
                 await api.post('/api/identity/verify', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
