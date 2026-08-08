@@ -376,7 +376,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
 
                     {/* Controls */}
                     <div className="flex justify-center gap-4 w-full">
-                        {loadingIdentity ? null : (!videoBlob && !isVerified) ? (
+                        {loadingIdentity ? null : !videoBlob ? (
                             recording ? (
                                 <button 
                                     onClick={stopRecording}
@@ -394,19 +394,17 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                             )
                         ) : (
                             <>
-                                {!isVerified && (
-                                    <button 
-                                        onClick={retakeVideo}
-                                        disabled={submitting}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-colors ${
-                                            darkMode 
-                                                ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
-                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                        }`}
-                                    >
-                                        <RefreshCw className="w-4 h-4" /> Retake
-                                    </button>
-                                )}
+                                <button 
+                                    onClick={retakeVideo}
+                                    disabled={submitting}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-colors ${
+                                        darkMode 
+                                            ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
+                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                    }`}
+                                >
+                                    <RefreshCw className="w-4 h-4" /> Retake
+                                </button>
                                 
                                 <button 
                                     onClick={handleSubmit}
