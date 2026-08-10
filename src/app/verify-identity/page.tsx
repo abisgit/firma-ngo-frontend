@@ -18,6 +18,8 @@ export default function VerifyIdentityPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
+    const [isPending, setIsPending] = useState(false);
+    const [rejectReason, setRejectReason] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -37,6 +39,11 @@ export default function VerifyIdentityPage() {
                 const res = await api.get('/auth/me');
                 if (res.data.isVerified) {
                     setIsVerified(true);
+                } else if (res.data.videoUrl && !res.data.kycRejectionReason) {
+                    setIsPending(true);
+                }
+                if (res.data.kycRejectionReason) {
+                    setRejectReason(res.data.kycRejectionReason);
                 }
             } catch (err) {
                 console.error(err);
@@ -175,9 +182,12 @@ export default function VerifyIdentityPage() {
             await api.post('/users/verify', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-
+            setIsPending(true);
+            setRejectReason(null);
             setSuccess(true);
-            setIsVerified(true);
+            setTimeout(() => {
+                // Keep them on the pending screen or something
+            }, 3000);
         } catch (err: any) {
             console.error('Error verifying identity:', err);
             setError(err.response?.data?.message || 'Failed to verify identity. Please try again.');
@@ -223,8 +233,32 @@ export default function VerifyIdentityPage() {
                             Go to Documents
                         </button>
                     </div>
+                ) : isPending ? (
+                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8 text-center text-blue-800">
+                        <Loader2 className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-spin" />
+                        <h2 className="text-2xl font-bold mb-2">Verification Pending</h2>
+                        <p>Your identity verification is currently being reviewed by an administrator. Please check back later.</p>
+                        <button 
+                            onClick={() => router.push('/dashboard')}
+                            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+                        >
+                            Back to Dashboard
+                        </button>
+                    </div>
                 ) : (
                     <div className="space-y-8 pb-20">
+                        {rejectReason && (
+                            <div className="bg-red-50 border-2 border-red-200 text-red-700 p-6 rounded-2xl flex items-start gap-4">
+                                <AlertCircle className="w-8 h-8 text-red-500 flex-shrink-0" />
+                                <div>
+                                    <h3 className="font-bold text-lg mb-1">Verification Rejected</h3>
+                                    <p className="mb-2">Your previous identity verification was rejected for the following reason:</p>
+                                    <p className="font-semibold bg-white p-3 rounded-xl border border-red-100">{rejectReason}</p>
+                                    <p className="mt-4 text-sm">Please review the reason and re-submit your details below.</p>
+                                </div>
+                            </div>
+                        )}
+                        
                         {error && (
                             <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-2 border border-red-100">
                                 <AlertCircle className="w-5 h-5" />
