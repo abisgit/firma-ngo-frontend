@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import api from '@/lib/api';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
     const [themeConfig, setThemeConfig] = useState({
         primaryColor: '#10b981', // Default primary-500
         secondaryColor: '#047857'
@@ -13,6 +15,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         // Function to apply colors to CSS variables
         const applyTheme = (primary: string, secondary: string) => {
             const root = document.documentElement;
+            if (pathname === '/login') {
+                root.style.setProperty('--primary-color', '#10b981'); // Default fallback
+                root.style.setProperty('--secondary-color', '#047857');
+                return;
+            }
             root.style.setProperty('--primary-color', primary);
             root.style.setProperty('--secondary-color', secondary);
             
@@ -56,7 +63,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         } else {
              applyTheme(themeConfig.primaryColor, themeConfig.secondaryColor);
         }
-    }, [themeConfig.primaryColor, themeConfig.secondaryColor]);
+    }, [themeConfig.primaryColor, themeConfig.secondaryColor, pathname]);
 
     return (
         <>
