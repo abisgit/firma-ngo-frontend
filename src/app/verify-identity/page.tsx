@@ -189,7 +189,7 @@ export default function VerifyIdentityPage() {
     if (loading) {
         return (
             <div className={`min-h-screen flex ${darkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
-                <Sidebar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} user={{}} />
+                <Sidebar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} user={null} />
                 <main className="flex-1 p-8 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
                 </main>
@@ -199,7 +199,7 @@ export default function VerifyIdentityPage() {
 
     return (
         <div className={`min-h-screen flex ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
-            <Sidebar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} user={{}} />
+            <Sidebar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} user={null} />
             <main className="flex-1 p-8 max-w-5xl mx-auto">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold flex items-center gap-3">
