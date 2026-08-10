@@ -59,6 +59,7 @@ export default function Sidebar({ darkMode, toggleTheme, user: initialUser }: Si
         { name: 'Documents', path: '/documents', icon: FileText },
         { name: 'Approvals', path: '/approvals', icon: CheckSquare },
         { name: 'Verification', path: '/verify', icon: SearchCheck },
+        { name: 'Identity Settings', path: '/verify-identity', icon: Shield },
     ];
 
     if (user?.role === 'SUPER_ADMIN' || user?.role === 'SYSTEM_ADMIN') {
