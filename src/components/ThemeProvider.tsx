@@ -28,6 +28,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
             // Since `primary` is a HEX string (e.g. #b71010), we can just set it.
         };
 
+        if (pathname === '/login') {
+            applyTheme('#10b981', '#047857');
+            return;
+        }
+
         // Try load from local storage first to prevent FOUC
         const storedOrg = localStorage.getItem('organization');
         if (storedOrg) {
