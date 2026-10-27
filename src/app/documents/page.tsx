@@ -313,7 +313,7 @@ export default function DocumentsPage() {
                                             </button>
                                         )}
                                         
-                                        {doc.status === 'DRAFT' && (
+                                        {(doc.status === 'DRAFT' || doc.status === 'PENDING_SIGNATURES') && (
                                             <button
                                                 onClick={() => handleSign(doc.id)}
                                                 className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border rounded-lg transition-all ${
@@ -322,7 +322,7 @@ export default function DocumentsPage() {
                                                         : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:text-blue-700'
                                                 }`}
                                             >
-                                                <CheckCircle className="h-3.5 w-3.5" /> Sign Document
+                                                <CheckCircle className="h-3.5 w-3.5" /> Apply Signature
                                             </button>
                                         )}
 

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { getMe } from '@/lib/api';
 import api from '@/lib/api';
 import Sidebar from '@/components/Sidebar';
-import { CheckSquare, AlertCircle, Video, ShieldCheck, Award, Loader, Check, CircleDot, Sun, Moon } from 'lucide-react';
+import SignatureModal from '@/components/SignatureModal';
+import { CheckSquare, AlertCircle, Video, ShieldCheck, Award, Loader, Check, CircleDot, Sun, Moon, CheckCircle } from 'lucide-react';
 
 export default function ApprovalsPage() {
     const [user, setUser] = useState<any>(null);
@@ -14,10 +15,9 @@ export default function ApprovalsPage() {
     const [actioningId, setActioningId] = useState<string | null>(null);
     const [darkMode, setDarkMode] = useState(false);
 
-    // Modal state for Biometric Video Consent
-    const [showVideoModal, setShowVideoModal] = useState(false);
+    // Signature Modal state
+    const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
-    const [recordingStep, setRecordingStep] = useState(0); // 0: Init, 1: Recording, 2: Finished
 
     const router = useRouter();
 
@@ -62,33 +62,16 @@ export default function ApprovalsPage() {
     // Actions
     const handleStartSign = (docId: string) => {
         setSelectedDocId(docId);
-        setRecordingStep(0);
-        setShowVideoModal(true);
+        setSignatureModalOpen(true);
     };
 
-    const handleMockRecord = () => {
-        setRecordingStep(1);
-        setTimeout(() => {
-            setRecordingStep(2);
-        }, 3000); // Mock a 3-second biometric recording session
-    };
-
-    const handleConfirmSign = async () => {
-        if (!selectedDocId) return;
-        setActioningId(selectedDocId);
-        setShowVideoModal(false);
-
+    const handleSignSuccess = async () => {
         try {
-            await api.post(`/documents/${selectedDocId}/sign`, {
-                videoUrl: '/uploads/biometric_consent_officer.mp4' // Mock video URL
-            });
-            // Reload docs
             const docsRes = await api.get('/documents');
             setDocuments(docsRes.data);
         } catch (err) {
-            console.error('Error signing document:', err);
+            console.error('Failed to reload documents after signing:', err);
         } finally {
-            setActioningId(null);
             setSelectedDocId(null);
         }
     };
@@ -108,8 +91,8 @@ export default function ApprovalsPage() {
     };
 
     // Filters for lists
-    // 1. Pending Signatures (Drafts that need approval by Directors or Managers or Admins)
-    const pendingSignatures = documents.filter(d => d.status === 'DRAFT');
+    // 1. Pending Signatures (Drafts and Pending documents that need approval by Directors or Managers or Admins)
+    const pendingSignatures = documents.filter(d => d.status === 'DRAFT' || d.status === 'PENDING_SIGNATURES');
     
     // 2. Ready to Anchor (Approved documents that need Global Manager or Admin to anchor)
     const readyToAnchor = documents.filter(d => d.status === 'APPROVED');
@@ -222,8 +205,8 @@ export default function ApprovalsPage() {
                                                 disabled={actioningId === doc.id}
                                                 className="py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
                                             >
-                                                {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Video className="h-3.5 w-3.5" />}
-                                                Verify & Sign
+                                                {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5" />}
+                                                Apply Signature
                                             </button>
                                         ) : (
                                             <span className="text-[11px] font-semibold text-rose-500 shrink-0 flex items-center gap-1">
@@ -323,75 +306,17 @@ export default function ApprovalsPage() {
                 </main>
             </div>
 
-            {/* BIOMETRIC VIDEO CONSENT MODAL */}
-            {showVideoModal && (
-                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 transition-opacity">
-                    <div className={`w-full max-w-md border rounded-2xl p-6 shadow-2xl ${
-                        darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
-                    }`}>
-                        <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
-                            <Video className="h-5 w-5 text-primary-500" /> Biometric Verification
-                        </h3>
-                        <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'} mb-6`}>
-                            Record video attestation to prove your physical consent for the cryptographic signing key.
-                        </p>
-
-                        {/* Video Recording Area Mock */}
-                        <div className="w-full aspect-video rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center relative overflow-hidden mb-6">
-                            {recordingStep === 0 && (
-                                <div className="text-center p-4">
-                                    <CircleDot className="h-8 w-8 text-slate-500 mx-auto mb-2" />
-                                    <span className="text-xs text-slate-400 font-semibold block">Camera Feed Ready</span>
-                                    <p className="text-[10px] text-slate-600 mt-1 max-w-xs">You will need to read out loud: "I verify the integrity of this audit and consent to sign."</p>
-                                </div>
-                            )}
-                            {recordingStep === 1 && (
-                                <div className="text-center p-4 animate-pulse">
-                                    <div className="h-3.5 w-3.5 rounded-full bg-rose-500 mx-auto mb-3 animate-ping" />
-                                    <span className="text-xs text-rose-500 font-bold block">RECORDING AUDIO/VIDEO FEED</span>
-                                    <p className="text-[11px] text-slate-300 mt-2 font-mono italic">"I verify the integrity of this audit and consent..."</p>
-                                </div>
-                            )}
-                            {recordingStep === 2 && (
-                                <div className="text-center p-4">
-                                    <Check className="h-8 w-8 text-primary-500 mx-auto mb-2" />
-                                    <span className="text-xs text-primary-400 font-bold block">Attestation Captured Successfully</span>
-                                    <p className="text-[10px] text-slate-500 mt-1">Biometric proof processed and mapped to the verification payload.</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Buttons */}
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => setShowVideoModal(false)}
-                                className={`flex-1 py-2.5 rounded-xl border text-xs font-semibold ${
-                                    darkMode ? 'border-slate-800 bg-slate-950/50 hover:bg-slate-950 text-slate-300' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                                }`}
-                            >
-                                Cancel
-                            </button>
-
-                            {recordingStep < 2 ? (
-                                <button
-                                    onClick={handleMockRecord}
-                                    disabled={recordingStep === 1}
-                                    className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 text-white font-bold rounded-xl text-xs shadow-md transition-all active:scale-95 disabled:opacity-50"
-                                >
-                                    {recordingStep === 1 ? 'Recording...' : 'Start Recording'}
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleConfirmSign}
-                                    className="flex-1 py-2.5 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl text-xs shadow-md transition-all active:scale-95"
-                                >
-                                    Confirm & Sign Ledger
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* SIGNATURE MODAL */}
+            <SignatureModal 
+                isOpen={signatureModalOpen} 
+                onClose={() => {
+                    setSignatureModalOpen(false);
+                    setSelectedDocId(null);
+                }} 
+                onSuccess={handleSignSuccess}
+                documentId={selectedDocId || ''}
+                darkMode={darkMode}
+            />
         </div>
     );
 }
