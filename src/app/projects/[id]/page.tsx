@@ -179,7 +179,11 @@ export default function ProjectDetailPage() {
 
                     <h3 className="text-xl font-bold mb-6">Associated Documents</h3>
                     <div className="space-y-4">
-                        {project.documents?.map((doc: any) => (
+                        {[...(project.documents || [])].sort((a: any, b: any) => {
+                            const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+                            const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+                            return timeB - timeA;
+                        }).map((doc: any) => (
                             <div key={doc.id} className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${
                                 darkMode 
                                     ? 'bg-slate-900/20 border-slate-800 hover:border-slate-700' 

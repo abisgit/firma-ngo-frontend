@@ -306,7 +306,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                         </div>
                         <div>
                             <h3 className={`text-base font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
-                                Apply Signature & Consent
+                                Video Consent Signature
                             </h3>
                             <p className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                                 Biometric Video Attestation & Cryptographic Signing
@@ -337,7 +337,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                     {isVerified ? (
                         <div className="flex items-center gap-2.5 p-3 rounded-xl bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20 text-xs font-semibold">
                             <CheckCircle className="w-4 h-4 shrink-0 text-green-500" />
-                            <span>Identity Pre-Verified via FIRMA Core. ID card upload bypassed.</span>
+                            <span>National ID Pre-Verified. Please record your 5-second video consent and draw your signature below.</span>
                         </div>
                     ) : (
                         <p className={`text-xs text-center ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -523,7 +523,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                                 <button 
                                     type="button"
                                     onClick={startRecording}
-                                    className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md"
+                                    className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all shadow-sm active:scale-98"
                                 >
                                     <Video className="w-4 h-4" /> Start Video Recording (5s)
                                 </button>
@@ -547,7 +547,7 @@ export default function SignatureModal({ isOpen, onClose, onSuccess, documentId,
                                     type="button"
                                     onClick={handleSubmit}
                                     disabled={submitting}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-slate-950 bg-gradient-to-r from-primary-500 to-teal-400 hover:from-primary-400 hover:to-teal-300 transition-all shadow-md disabled:opacity-50 active:scale-98"
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-bold text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all shadow-sm disabled:opacity-50 active:scale-98"
                                 >
                                     {submitting ? (
                                         <UploadCloud className="w-4 h-4 animate-bounce" />

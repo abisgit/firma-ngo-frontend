@@ -224,9 +224,9 @@ function VerificationContent() {
                                 <button
                                     type="submit"
                                     disabled={searching}
-                                    className="py-3 px-6 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 shrink-0"
+                                    className="py-3 px-6 bg-white text-slate-900 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-sm shadow-sm transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 shrink-0"
                                 >
-                                    {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
+                                    {searching ? <Loader className="h-4 w-4 animate-spin text-slate-700" /> : <SearchCheck className="h-4 w-4 text-slate-700" />}
                                     Verify
                                 </button>
                             </form>
@@ -261,9 +261,9 @@ function VerificationContent() {
                                 <button
                                     type="submit"
                                     disabled={searching || !fileInput}
-                                    className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-sm shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                                    className="w-full py-3 px-4 bg-white text-slate-900 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-sm shadow-sm transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
                                 >
-                                    {searching ? <Loader className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />}
+                                    {searching ? <Loader className="h-4 w-4 animate-spin text-slate-700" /> : <SearchCheck className="h-4 w-4 text-slate-700" />}
                                     Scan & Audit Document Trail
                                 </button>
                             </form>

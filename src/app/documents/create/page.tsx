@@ -276,10 +276,10 @@ export default function CreateDocumentPage() {
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-lg shadow-primary-500/10 text-sm"
+                                className="w-full py-3 px-4 bg-white text-slate-900 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group shadow-sm text-sm"
                             >
                                 {submitting ? 'Creating draft...' : 'Create Draft'}
-                                {!submitting && <Send className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
+                                {!submitting && <Send className="h-4 w-4 group-hover:translate-x-1 transition-transform text-slate-700" />}
                             </button>
                         </form>
                     </div>

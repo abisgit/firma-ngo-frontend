@@ -21,6 +21,14 @@ export default function ApprovalsPage() {
 
     const router = useRouter();
 
+    const sortDocuments = (docs: any[]) => {
+        return [...docs].sort((a, b) => {
+            const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+            const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
+    };
+
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
@@ -41,7 +49,7 @@ export default function ApprovalsPage() {
                 setUser(userData);
 
                 const docsRes = await api.get('/documents');
-                setDocuments(docsRes.data);
+                setDocuments(sortDocuments(docsRes.data));
             } catch (err) {
                 console.error('Error fetching approvals data:', err);
                 router.push('/login');
@@ -68,7 +76,7 @@ export default function ApprovalsPage() {
     const handleSignSuccess = async () => {
         try {
             const docsRes = await api.get('/documents');
-            setDocuments(docsRes.data);
+            setDocuments(sortDocuments(docsRes.data));
         } catch (err) {
             console.error('Failed to reload documents after signing:', err);
         } finally {
@@ -82,7 +90,7 @@ export default function ApprovalsPage() {
             await api.post(`/documents/${docId}/anchor`);
             // Reload docs
             const docsRes = await api.get('/documents');
-            setDocuments(docsRes.data);
+            setDocuments(sortDocuments(docsRes.data));
         } catch (err) {
             console.error('Error anchoring document:', err);
         } finally {
@@ -90,12 +98,13 @@ export default function ApprovalsPage() {
         }
     };
 
-    // Filters for lists
+    // Filters for lists (sorted latest first so new drafts, freshly signed, and newly anchored docs appear at the top)
+    const sortedDocs = sortDocuments(documents);
     // 1. Pending Signatures (Drafts and Pending documents that need approval by Directors or Managers or Admins)
-    const pendingSignatures = documents.filter(d => d.status === 'DRAFT' || d.status === 'PENDING_SIGNATURES');
+    const pendingSignatures = sortedDocs.filter(d => d.status === 'DRAFT' || d.status === 'PENDING_SIGNATURES');
     
     // 2. Ready to Anchor (Approved documents that need Global Manager or Admin to anchor)
-    const readyToAnchor = documents.filter(d => d.status === 'APPROVED');
+    const readyToAnchor = sortedDocs.filter(d => d.status === 'APPROVED');
 
     // Permissions check
     const canSign = user?.role === 'COUNTRY_DIRECTOR' || user?.role === 'GLOBAL_MANAGER' || user?.role === 'SUPER_ADMIN';
@@ -203,9 +212,9 @@ export default function ApprovalsPage() {
                                             <button
                                                 onClick={() => handleStartSign(doc.id)}
                                                 disabled={actioningId === doc.id}
-                                                className="py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
+                                                className="py-2 px-4 bg-white text-slate-900 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-xs shadow-sm transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
                                             >
-                                                {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5" />}
+                                                {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin text-slate-700" /> : <CheckCircle className="h-3.5 w-3.5 text-slate-700" />}
                                                 Apply Signature
                                             </button>
                                         ) : (
@@ -282,9 +291,9 @@ export default function ApprovalsPage() {
                                             <button
                                                 onClick={() => handleAnchor(doc.id)}
                                                 disabled={actioningId === doc.id}
-                                                className="py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
+                                                className="py-2 px-4 bg-white text-slate-900 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-xs shadow-sm transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 shrink-0"
                                             >
-                                                {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Award className="h-3.5 w-3.5" />}
+                                                {actioningId === doc.id ? <Loader className="h-3.5 w-3.5 animate-spin text-slate-700" /> : <Award className="h-3.5 w-3.5 text-slate-700" />}
                                                 Anchor to Ledger
                                             </button>
                                         ) : (

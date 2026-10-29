@@ -46,8 +46,13 @@ export default function DocumentsPage() {
                 setUser(userData);
 
                 const docsRes = await api.get('/documents');
-                setDocuments(docsRes.data);
-                setFilteredDocs(docsRes.data);
+                const sorted = [...docsRes.data].sort((a: any, b: any) => {
+                    const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+                    const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+                    return timeB - timeA;
+                });
+                setDocuments(sorted);
+                setFilteredDocs(sorted);
 
                 // Check FIRMA Core connection
                 try {
@@ -67,9 +72,17 @@ export default function DocumentsPage() {
         fetchData();
     }, [router]);
 
-    // Apply filters
+    const sortDocuments = (docs: any[]) => {
+        return [...docs].sort((a, b) => {
+            const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+            const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
+    };
+
+    // Apply filters and sort latest on top
     useEffect(() => {
-        let results = [...documents];
+        let results = sortDocuments(documents);
         if (statusFilter !== 'ALL') {
             results = results.filter((doc) => doc.status === statusFilter);
         }
@@ -135,22 +148,24 @@ export default function DocumentsPage() {
     const fetchDocuments = useCallback(async () => {
         try {
             const docsRes = await api.get('/documents');
-            setDocuments(docsRes.data);
-            let results = [...docsRes.data];
+            const sorted = sortDocuments(docsRes.data);
+            setDocuments(sorted);
+            let results = [...sorted];
             if (statusFilter !== 'ALL') results = results.filter((doc: any) => doc.status === statusFilter);
             if (typeFilter !== 'ALL') results = results.filter((doc: any) => doc.documentType === typeFilter);
             setFilteredDocs(results);
         } catch (err) {
             console.error('Failed to fetch documents', err);
         }
-    }, []);
+    }, [statusFilter, typeFilter]);
 
     const handleAnchor = async (id: string) => {
         try {
             await api.post(`/documents/${id}/anchor`);
             const docsRes = await api.get('/documents');
-            setDocuments(docsRes.data);
-            let results = [...docsRes.data];
+            const sorted = sortDocuments(docsRes.data);
+            setDocuments(sorted);
+            let results = [...sorted];
             if (statusFilter !== 'ALL') results = results.filter((doc: any) => doc.status === statusFilter);
             if (typeFilter !== 'ALL') results = results.filter((doc: any) => doc.documentType === typeFilter);
             setFilteredDocs(results);
@@ -203,9 +218,9 @@ export default function DocumentsPage() {
                         {(user?.role === 'FIELD_OFFICER' || user?.role === 'SUPER_ADMIN') && (
                             <Link
                                 href="/documents/create"
-                                className="flex items-center gap-2 py-2 px-4 bg-gradient-to-r from-primary-500 to-teal-500 text-slate-950 font-bold rounded-xl hover:from-primary-400 hover:to-teal-400 text-xs shadow-md transition-all active:scale-95"
+                                className="flex items-center gap-2 py-2 px-4 bg-white text-slate-900 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-xs shadow-sm transition-all active:scale-95"
                             >
-                                <Plus className="h-4 w-4" /> Create Document
+                                <Plus className="h-4 w-4 text-slate-700" /> Create Document
                             </Link>
                         )}
                     </div>
