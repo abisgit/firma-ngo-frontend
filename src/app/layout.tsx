@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { PostHogProvider } from "@/components/providers/PostHogProvider";
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <PostHogProvider>
-            <PostHogPageView />
+            <Suspense fallback={null}>
+              <PostHogPageView />
+            </Suspense>
             {children}
           </PostHogProvider>
         </ThemeProvider>
